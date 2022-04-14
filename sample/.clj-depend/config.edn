@@ -1,0 +1,6 @@
+{:layers {:controller {:defined-by         ".*\\.controller\\..*"
+                       :accessed-by-layers #{}}
+          :logic      {:defined-by         ".*\\.logic\\..*"
+                       :accessed-by-layers #{:controller}}
+          :model      {:defined-by         ".*\\.model\\..*"
+                       :accessed-by-layers #{:logic :controller}}}}
