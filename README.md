@@ -12,6 +12,8 @@ Add `[org.clojars.fabiodomingues/clj-depend "0.1.0-SNAPSHOT"]` to `:plugins`.
 $ lein clj-depend
 ```
 
+If any cyclic dependency is found, the analysis will fail and an error message like this example will be displayed: `Circular dependency between "foo" and "bar"`.
+
 ## Configuration
 
 To let clj-depend know the existing layers in your application and the allowed dependencies between these layers, create a `.clj-depend` directory at the root of the project and inside it a `config.edn` file.
