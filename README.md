@@ -4,9 +4,9 @@ A Clojure namespace dependency analyzer.
 
 > ⚠️ Not ready, still in development.
 
-## Usage
+## Usage (leiningen)
 
-Add `[clj-depend "0.1.0"]` to `:plugins`.
+Add `[org.clojars.fabiodomingues/clj-depend "0.1.0-SNAPSHOT"]` to `:plugins`.
 
 ```
 $ lein clj-depend
