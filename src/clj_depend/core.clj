@@ -1,12 +1,9 @@
 (ns clj-depend.core
-  (:require [clojure.string :as str]
-            [clj-depend.config :as config]
+  (:require [clj-depend.config :as config]
             [clj-depend.analyzer :as analyzer]
             [clojure.tools.namespace.find :as namespace.find]
             [clojure.tools.namespace.parse :as namespace.parse]
             [clojure.java.io :as io]))
-
-(def print-pattern "- \"{NAMESPACE}\" depends on \"{VIOLATION}\"")
 
 (defn print!
   [analyzer-report duration]
@@ -14,9 +11,7 @@
     (when (> (count analyzer-report) 0)
       (println "Identified violations:")
       (doseq [{:keys [namespace violation]} analyzer-report]
-        (println (-> print-pattern
-                     (str/replace "{NAMESPACE}" namespace)
-                     (str/replace "{VIOLATION}" violation)))))
+        (println (str \" namespace \" " namespace depends on " violation))))
     (println (format "\nclj-depend took %sms, violations: %s" duration violations-count))))
 
 (defn parse-clojure-files!
