@@ -11,3 +11,6 @@ pom.xml.asc
 /.prepl-port
 *.iml
 .idea
+.clj-kondo
+.calva
+.lsp
