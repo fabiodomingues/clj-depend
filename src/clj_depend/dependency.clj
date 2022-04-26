@@ -1,11 +1,11 @@
 (ns clj-depend.dependency
   (:require [clojure.tools.namespace.dependency :as namespace.dependency]
-            [clj-depend.model.namespace :as model.namespace]
+            [clj-depend.model :as model]
             [schema.core :as s]))
 
 (s/defn dependencies-graph
   "Return a `clojure.tools.namespace` dependency graph of namespaces named by `ns-symbol`."
-  [namespaces :- [model.namespace/Namespace]]
+  [namespaces :- [model/Namespace]]
   (reduce
     (fn [graph namespace]
       (reduce

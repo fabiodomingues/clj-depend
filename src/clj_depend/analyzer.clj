@@ -1,5 +1,5 @@
 (ns clj-depend.analyzer
-  (:require [clj-depend.model.analyzer :as model.analyzer]
+  (:require [clj-depend.model :as model]
             [clj-depend.dependency :as dependency]
             [schema.core :as s]))
 
@@ -31,7 +31,7 @@
 
 (s/defn analyze
   "Analyze namespaces dependencies."
-  [{:keys [config namespaces]} :- model.analyzer/Context]
+  [{:keys [config namespaces]} :- model/Context]
   (let [dependency-graph (dependency/dependencies-graph namespaces)
         violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))]
     (map (fn [{:keys [namespace dependent-namespace]}]
