@@ -5,7 +5,7 @@
 
 (defn read!
   [project-dir]
-  (let [f (io/file project-dir ".clj-depend" "config.edn")]
-    (when (.exists f)
-      (with-open [r (PushbackReader. (io/reader f))]
-        (edn/read r)))))
+  (let [config-edn-file (io/file project-dir ".clj-depend" "config.edn")]
+    (when (.exists config-edn-file)
+      (with-open [reader (PushbackReader. (io/reader config-edn-file))]
+        (edn/read reader)))))
