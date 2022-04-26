@@ -8,10 +8,10 @@
 
 (def print-pattern "- \"{NAMESPACE}\" depends on \"{VIOLATION}\"")
 
-(defn print!
+(defn- print!
   [analyzer-report duration]
   (let [violations-count (count analyzer-report)]
-    (when (> (count analyzer-report) 0)
+    (when (pos? violations-count)
       (println "Identified violations:")
       (doseq [{:keys [namespace violation]} analyzer-report]
         (println (-> print-pattern
@@ -19,7 +19,7 @@
                      (str/replace "{VIOLATION}" violation)))))
     (println (format "\nclj-depend took %sms, violations: %s" duration violations-count))))
 
-(defn parse-clojure-files!
+(defn- parse-clojure-files!
   [dirs]
   (let [ns-decls (mapcat (fn [dir]
                            (namespace.find/find-ns-decls-in-dir (io/file dir))) dirs)]
@@ -30,12 +30,12 @@
 (defn execute!
   "Analyze namespaces dependencies."
   [project-dir source-paths]
-  (let [start-time (System/currentTimeMillis)
-        config (config/read! project-dir)
-        namespaces (parse-clojure-files! source-paths)
+  (let [start-time      (System/currentTimeMillis)
+        config          (config/read! project-dir)
+        namespaces      (parse-clojure-files! source-paths)
         analyzer-report (analyzer/analyze config namespaces)
-        duration (- (System/currentTimeMillis) start-time)]
+        duration        (- (System/currentTimeMillis) start-time)]
     (print! analyzer-report duration)
-    (if (= 0 (count analyzer-report))
+    (if (zero? (count analyzer-report))
       (System/exit 0)
       (System/exit 1))))
