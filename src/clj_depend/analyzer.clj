@@ -33,10 +33,7 @@
   "Analyze namespaces dependencies."
   [{:keys [config namespaces]} :- model.analyzer/Context]
   (let [dependency-graph (dependency/dependencies-graph namespaces)
-        violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))
-        violations-by-namespace (->> (group-by :dependent-namespace violations)
-                                     (map (fn [[key values]] {:namespace  key
-                                                              :violations (map :namespace values)})))]
+        violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))]
     (map (fn [{:keys [namespace dependent-namespace]}]
            {:namespace dependent-namespace
             :violation namespace}) violations)))

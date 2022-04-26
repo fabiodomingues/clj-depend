@@ -1,6 +1,5 @@
 (ns clj-depend.core
-  (:require [clojure.java.io :as io]
-            [schema.core :as s]
+  (:require [schema.core :as s]
             [clojure.string :as str])
   (:use [clojure.pprint]))
 
