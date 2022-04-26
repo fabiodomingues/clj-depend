@@ -1,17 +1,17 @@
 (ns clj-depend.analyzer
   (:require [clj-depend.dependency :as dependency]))
 
-(defn layer-by-namespace
+(defn- layer-by-namespace
   [config namespace]
   (first (filter #(re-find (re-pattern (get-in config [:layers % :defined-by])) namespace) (keys (:layers config)))))
 
-(defn violate?
+(defn- violate?
   [config
    {:keys [layer dependent-layer]}]
   (let [accessed-by-layers (get-in config [:layers layer :accessed-by-layers])]
-    (not (some #(= dependent-layer %) accessed-by-layers))))
+    (not-any? (partial = dependent-layer) accessed-by-layers)))
 
-(defn layer-and-namespace [config namespace dependent-namespace]
+(defn- layer-and-namespace [config namespace dependent-namespace]
   (let [layer (layer-by-namespace config namespace)
         dependent-layer (layer-by-namespace config dependent-namespace)]
     {:namespace           namespace
@@ -19,7 +19,7 @@
      :layer               layer
      :dependent-layer     dependent-layer}))
 
-(defn violations
+(defn- violations
   [config dependency-graph namespace]
   (let [dependent-namespaces (dependency/transitive-dependents dependency-graph namespace)]
     (->> dependent-namespaces
@@ -34,4 +34,5 @@
         violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))]
     (map (fn [{:keys [namespace dependent-namespace]}]
            {:namespace dependent-namespace
-            :violation namespace}) violations)))
+            :violation namespace})
+         violations)))

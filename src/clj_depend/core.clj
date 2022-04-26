@@ -8,7 +8,7 @@
 (defn- print!
   [analyzer-report duration]
   (let [violations-count (count analyzer-report)]
-    (when (> (count analyzer-report) 0)
+    (when (pos? violations-count)
       (println "Identified violations:")
       (doseq [{:keys [namespace violation]} analyzer-report]
         (println (str \" namespace \" " namespace depends on " violation))))
@@ -25,12 +25,12 @@
 (defn execute!
   "Analyze namespaces dependencies."
   [project-dir source-paths]
-  (let [start-time (System/currentTimeMillis)
-        config (config/read! project-dir)
-        namespaces (parse-clojure-files! source-paths)
+  (let [start-time      (System/currentTimeMillis)
+        config          (config/read! project-dir)
+        namespaces      (parse-clojure-files! source-paths)
         analyzer-report (analyzer/analyze config namespaces)
-        duration (- (System/currentTimeMillis) start-time)]
+        duration        (- (System/currentTimeMillis) start-time)]
     (print! analyzer-report duration)
-    (if (= 0 (count analyzer-report))
+    (if (zero? (count analyzer-report))
       (System/exit 0)
       (System/exit 1))))
