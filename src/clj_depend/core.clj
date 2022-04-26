@@ -5,7 +5,7 @@
             [clojure.tools.namespace.parse :as namespace.parse]
             [clojure.java.io :as io]))
 
-(defn print!
+(defn- print!
   [analyzer-report duration]
   (let [violations-count (count analyzer-report)]
     (when (> (count analyzer-report) 0)
@@ -14,7 +14,7 @@
         (println (str \" namespace \" " namespace depends on " violation))))
     (println (format "\nclj-depend took %sms, violations: %s" duration violations-count))))
 
-(defn parse-clojure-files!
+(defn- parse-clojure-files!
   [dirs]
   (let [ns-decls (mapcat (fn [dir]
                            (namespace.find/find-ns-decls-in-dir (io/file dir))) dirs)]
