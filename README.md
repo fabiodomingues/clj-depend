@@ -22,12 +22,16 @@ To let clj-depend know the existing layers in your application and the allowed d
 
 ### Layer Checks
 
+Diagram to exemplify the dependency between layers:
+
 ```mermaid
 graph TD
     A[foo.controller] --> B[foo.logic]
     A --> C[foo.model]
     B --> C
 ```
+
+Configuration file (`.clj-depend/config.edn`) for diagram above:
 
 ```clojure
 {:layers {:controller {:defined-by         ".*\\.controller\\..*"
