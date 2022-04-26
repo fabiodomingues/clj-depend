@@ -1,12 +1,14 @@
+[![Clojars Project](http://clojars.org/com.fabiodomingues/clj-depend/latest-version.svg)](http://clojars.org/com.fabiodomingues/clj-depend)
+
 # clj-depend
 
 A Clojure namespace dependency analyzer.
 
 > ⚠️ Not ready, still in development.
 
-## Usage (leiningen)
+## Usage
 
-Add `[org.clojars.fabiodomingues/clj-depend "0.1.0-SNAPSHOT"]` to `:plugins`.
+Add `[com.fabiodomingues/clj-depend "0.1.0"]` to `:plugins`.
 
 ```
 $ lein clj-depend
