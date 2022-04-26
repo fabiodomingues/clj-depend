@@ -1,6 +1,5 @@
 (ns clj-depend.core
-  (:require [schema.core :as s]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [clj-depend.config :as config]
             [clj-depend.analyzer :as analyzer]
             [clojure.tools.namespace.find :as namespace.find]
@@ -9,7 +8,7 @@
 
 (def print-pattern "- \"{NAMESPACE}\" depends on \"{VIOLATION}\"")
 
-(s/defn print!
+(defn print!
   [analyzer-report duration]
   (let [violations-count (count analyzer-report)]
     (when (> (count analyzer-report) 0)
@@ -34,8 +33,7 @@
   (let [start-time (System/currentTimeMillis)
         config (config/read! project-dir)
         namespaces (parse-clojure-files! source-paths)
-        analyzer-report (analyzer/analyze {:config     config
-                                           :namespaces namespaces})
+        analyzer-report (analyzer/analyze config namespaces)
         duration (- (System/currentTimeMillis) start-time)]
     (print! analyzer-report duration)
     (if (= 0 (count analyzer-report))

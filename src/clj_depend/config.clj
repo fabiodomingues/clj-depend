@@ -1,13 +1,7 @@
 (ns clj-depend.config
   (:require [clojure.java.io :as io]
-            [clojure.edn :as edn]
-            [schema.core :as s])
+            [clojure.edn :as edn])
   (:import (java.io PushbackReader)))
-
-(def Layer {:defined-by s/Str                               ; TODO: Change to s/Regex
-            :accessed-by-layers #{s/Keyword}})
-
-(def Config {:layers {s/Keyword Layer}})
 
 (defn read!
   [project-dir]

@@ -1,7 +1,5 @@
 (ns clj-depend.analyzer
-  (:require [clj-depend.model :as model]
-            [clj-depend.dependency :as dependency]
-            [schema.core :as s]))
+  (:require [clj-depend.dependency :as dependency]))
 
 (defn layer-by-namespace
   [config namespace]
@@ -29,9 +27,9 @@
          (filter #(violate? config %))
          not-empty)))
 
-(s/defn analyze
+(defn analyze
   "Analyze namespaces dependencies."
-  [{:keys [config namespaces]} :- model/Context]
+  [config namespaces]
   (let [dependency-graph (dependency/dependencies-graph namespaces)
         violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))]
     (map (fn [{:keys [namespace dependent-namespace]}]
