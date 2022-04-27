@@ -6,7 +6,7 @@
 
 (deftest clj-depend-test
 
-  (testing "should return zero violations when there is no forbidden access"
+  (testing "should return zero violations when there are no violations"
     (let [captured-exit-code (atom nil)]
       (with-redefs [clj-depend.core/exit! (fn [code] (reset! captured-exit-code code))]
         (let [output (with-out-str (lein/clj-depend {:root         (.getPath (io/resource "without-violations"))
@@ -14,7 +14,7 @@
           (is (= 0 @captured-exit-code))
           (is (= "Identified 0 violations\n" output))))))
 
-  (testing "should return violations when there is any forbidden access"
+  (testing "should return violations when there is any violation"
     (let [captured-exit-code (atom nil)]
       (with-redefs [clj-depend.core/exit! (fn [code] (reset! captured-exit-code code))]
         (let [output (with-out-str (lein/clj-depend {:root         (.getPath (io/resource "with-violations"))
