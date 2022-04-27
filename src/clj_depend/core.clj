@@ -1,22 +1,17 @@
 (ns clj-depend.core
-  (:require [clojure.string :as str]
-            [clj-depend.config :as config]
+  (:require [clj-depend.config :as config]
             [clj-depend.analyzer :as analyzer]
             [clojure.tools.namespace.find :as namespace.find]
             [clojure.tools.namespace.parse :as namespace.parse]
             [clojure.java.io :as io]))
 
-(def print-pattern "- \"{NAMESPACE}\" depends on \"{VIOLATION}\"")
-
 (defn- print!
-  [analyzer-report duration]
+  [analyzer-report]
   (let [violations-count (count analyzer-report)]
     (println (format "Identified %d violations" violations-count))
     (when (pos? violations-count)
       (doseq [{:keys [namespace violation]} analyzer-report]
-        (println (-> print-pattern
-                     (str/replace "{NAMESPACE}" namespace)
-                     (str/replace "{VIOLATION}" violation)))))))
+        (println (str "- " \" namespace \" " depends on " \" violation \"))))))
 
 (defn- parse-clojure-files!
   [dirs]
@@ -34,16 +29,13 @@
   "Analyze namespaces dependencies."
   [project-dir source-paths]
   (try
-    (let [start-time (System/currentTimeMillis)
-          config (config/read! project-dir)
+    (let [config (config/read! project-dir)
           namespaces (parse-clojure-files! source-paths)
-          analyzer-report (analyzer/analyze config namespaces)
-          duration (- (System/currentTimeMillis) start-time)]
-      (print! analyzer-report duration)
+          analyzer-report (analyzer/analyze config namespaces)]
+      (print! analyzer-report)
       (if (zero? (count analyzer-report))
         (exit! 0)
         (exit! 1)))
     (catch Exception e
       (println (ex-message e))
-      (exit! 1))
-    ))
+      (exit! 1))))
