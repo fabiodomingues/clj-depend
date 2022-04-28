@@ -4,8 +4,6 @@
 
 A Clojure namespace dependency analyzer.
 
-> ⚠️ Not ready, still in development.
-
 ## Usage
 
 Add `[com.fabiodomingues/clj-depend "0.1.0"]` to `:plugins`.
@@ -14,7 +12,13 @@ Add `[com.fabiodomingues/clj-depend "0.1.0"]` to `:plugins`.
 $ lein clj-depend
 ```
 
-If any cyclic dependency is found, the analysis will fail and an error message like this example will be displayed: `Circular dependency between "foo" and "bar"`.
+In case any cyclic dependency is found the analysis will fail with the error message: `Circular dependency between "foo" and "bar"`.
+
+## Exit codes
+
+- 0: no violations were found
+- 1: one or more violations were found
+- 2: error during analysis
 
 ## Configuration
 
