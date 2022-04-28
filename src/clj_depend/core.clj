@@ -21,7 +21,7 @@
            {:name         (str (namespace.parse/name-from-ns-decl ns-decl))
             :dependencies (map str (namespace.parse/deps-from-ns-decl ns-decl))}) ns-decls)))
 
-(defn exit!
+(defn- exit!
   [code]
   (System/exit code))
 
@@ -38,4 +38,4 @@
         (exit! 1)))
     (catch Exception e
       (println (ex-message e))
-      (exit! 1))))
+      (exit! 2))))
