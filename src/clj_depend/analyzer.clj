@@ -21,7 +21,7 @@
 
 (defn- violations
   [config dependency-graph namespace]
-  (let [dependent-namespaces (dependency/transitive-dependents dependency-graph namespace)]
+  (let [dependent-namespaces (dependency/immediate-dependents dependency-graph namespace)]
     (->> dependent-namespaces
          (map #(layer-and-namespace config namespace %))
          (filter #(violate? config %))
