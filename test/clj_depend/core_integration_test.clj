@@ -1,4 +1,4 @@
-(ns clj-depend.clj-depend-integration-test
+(ns clj-depend.core-integration-test
   (:require [clojure.test :refer :all]
             [clj-depend.core :as clj-depend.core]
             [clojure.java.io :as io]
