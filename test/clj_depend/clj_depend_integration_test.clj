@@ -1,20 +1,19 @@
 (ns clj-depend.clj-depend-integration-test
   (:require [clojure.test :refer :all]
             [clj-depend.core :as clj-depend.core]
-            [leiningen.clj-depend :as leiningen]
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
 (defn project
   [path]
-  {:root         (.getPath (io/resource path))
+  {:project-root (.getPath (io/resource path))
    :source-paths [(.getPath (io/resource (str path "/src")))]})
 
 (defn- call-clj-depend
-  [project]
+  [{:keys [project-root source-paths]}]
   (let [captured-exit-code (atom nil)]
     (with-redefs [clj-depend.core/exit! (fn [code] (reset! captured-exit-code code))]
-      {:output    (-> (leiningen/clj-depend project)
+      {:output    (-> (clj-depend.core/execute! project-root source-paths)
                       (with-out-str)
                       (string/split-lines))
        :exit-code @captured-exit-code})))

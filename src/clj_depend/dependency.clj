@@ -13,7 +13,7 @@
     (namespace.dependency/graph)
     namespaces))
 
-(defn immediate-dependents
+(defn immediate-dependencies
   [dependency-graph
    namespace]
-  (namespace.dependency/immediate-dependents dependency-graph namespace))
+  (namespace.dependency/immediate-dependencies dependency-graph namespace))
