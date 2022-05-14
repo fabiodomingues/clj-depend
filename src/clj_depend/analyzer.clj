@@ -32,5 +32,6 @@
   (let [violations (flatten (keep #(violations config dependency-graph %) namespaces))]
     (map (fn [{:keys [namespace dependency-namespace]}]
            {:namespace namespace
-            :violation dependency-namespace})
+            :dependency-namespace dependency-namespace
+            :message (str \" namespace \" " should not depends on " \" dependency-namespace \")})
          violations)))

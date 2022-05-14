@@ -10,11 +10,16 @@
     :id :project-root
     :parse-fn io/file
     :validate [#(-> % io/file .exists) "Specify a valid path after --project-root"]]
-   [nil "--source-paths PATHS" "Source paths to clj-depend consider during analysis."
-    :id :source-paths
-    :validate [#(not (string/includes? (str %) " ")) "Paths should be separated by comma."]
+   [nil "--files PATHS" "Files or directories to clj-depend consider during analysis."
+    :id :files
+    :validate [#(not (string/includes? (str %) " ")) "Files should be separated by comma."]
     :assoc-fn #(assoc %1 %2 (->> (string/split %3 #",")
-                                 (map io/file)))]])
+                                 (map io/file)))]
+   [nil "--namespaces NAMESPACES" "Namespaces to be analyzed. If empty, all project namespaces will be considered."
+    :id :source-paths
+    :validate [#(not (string/includes? (str %) " ")) "Namespaces should be separated by comma."]
+    :assoc-fn #(assoc %1 %2 (->> (string/split %3 #",")
+                                 (map symbol)))]])
 
 (defn- exit!
   [exit-code message]
@@ -26,11 +31,7 @@
   (let [{:keys [options]} (cli/parse-opts args cli-options)]
     (internal-api/analyze options)))
 
-(defn main
+(defn -main
   [& args]
   (let [{:keys [result-code message]} (apply run! args)]
     (exit! result-code message)))
-
-(defn -main
-  [& args]
-  (main args))

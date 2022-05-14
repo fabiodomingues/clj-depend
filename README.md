@@ -38,7 +38,8 @@ graph TD
 Configuration file (`.clj-depend/config.edn`) for diagram above:
 
 ```clojure
-{:layers {:controller {:defined-by         ".*\\.controller\\..*"
+{:source-paths #{"src"}
+ :layers {:controller {:defined-by         ".*\\.controller\\..*"
                        :accessed-by-layers #{}}
           :logic      {:defined-by         ".*\\.logic\\..*"
                        :accessed-by-layers #{:controller}}

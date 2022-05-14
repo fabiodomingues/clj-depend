@@ -1,12 +1,11 @@
 (ns clj-depend.parser
   (:require [clojure.tools.namespace.find :as namespace.find]
-            [clojure.tools.namespace.parse :as namespace.parse]
-            [clojure.java.io :as io]))
+            [clojure.tools.namespace.parse :as namespace.parse]))
 
 (defn parse-clojure-files!
-  [source-paths namespaces]
-  (let [ns-decls (mapcat (fn [source-path]
-                           (namespace.find/find-ns-decls-in-dir (io/file source-path))) source-paths)]
+  [files namespaces]
+  (let [ns-decls (mapcat (fn [file]
+                           (namespace.find/find-ns-decls-in-dir file)) files)]
     (keep (fn [ns-decl]
             (when (or (nil? namespaces)
                       (contains? namespaces (namespace.parse/name-from-ns-decl ns-decl)))
