@@ -10,6 +10,22 @@ A Clojure namespace dependency analyzer.
 
 To run clj-depend from Leiningen, check [lein-clj-depend](https://github.com/clj-depend/lein-clj-depend) plugin.
 
+### Clojure CLI (tools.deps)
+
+Add clj-depend as a dependency, preferably under an alias in `deps.edn`.
+
+```clojure
+{:deps { ,,, }
+ :aliases {:clj-depend {:extra-deps {com.fabiodomingues/clj-depend {:mvn/version "0.5.1"}}
+                        :main-opts ["-m" "clj-depend.main"]}}}
+```
+
+Run:
+
+```
+clj -M:clj-depend
+```
+
 ### API
 
 You can use the namespace [clj-depend.api](https://cljdoc.org/d/com.fabiodomingues/clj-depend/CURRENT/api/clj-depend.api) to have access to all clj-depend features.
