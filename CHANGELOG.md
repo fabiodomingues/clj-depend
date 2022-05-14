@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.4.0 (2022-05-14)
+* Created an API for clj-depend.
+
 ## 0.3.0 (2022-05-09)
 * Fixed analyzer to only consider immediate dependencies for each namespace.
 * Extracted lein plugin to another project (lein-clj-depend).

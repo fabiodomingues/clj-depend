@@ -6,19 +6,13 @@ A Clojure namespace dependency analyzer.
 
 ## Usage
 
-Add `[com.fabiodomingues/clj-depend "0.2.0"]` to `:plugins`.
+### Leiningen
 
-```
-$ lein clj-depend
-```
+To run clj-depend from Leiningen, check [lein-clj-depend](https://github.com/clj-depend/lein-clj-depend) plugin.
 
-In case any cyclic dependency is found the analysis will fail with the error message: `Circular dependency between "foo" and "bar"`.
+### API
 
-## Exit codes
-
-- 0: no violations were found
-- 1: one or more violations were found
-- 2: error during analysis
+You can use the namespace [clj-depend.api](https://cljdoc.org/d/com.fabiodomingues/clj-depend/current/api/clj-depend.api) to have access to all clj-depend features.
 
 ## Configuration
 
