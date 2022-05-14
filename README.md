@@ -12,7 +12,7 @@ To run clj-depend from Leiningen, check [lein-clj-depend](https://github.com/clj
 
 ### API
 
-You can use the namespace [clj-depend.api](https://cljdoc.org/d/com.fabiodomingues/clj-depend/current/api/clj-depend.api) to have access to all clj-depend features.
+You can use the namespace [clj-depend.api](https://cljdoc.org/d/com.fabiodomingues/clj-depend/CURRENT/api/clj-depend.api) to have access to all clj-depend features.
 
 ## Configuration
 
