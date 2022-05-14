@@ -1,4 +1,4 @@
-(ns ^:no-doc clj-depend.main
+(ns clj-depend.main
   (:refer-clojure :exclude [run!])
   (:require [clj-depend.internal-api :as internal-api]
             [clojure.tools.cli :as cli]

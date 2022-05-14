@@ -1,4 +1,4 @@
-(ns ^:no-doc clj-depend.parser
+(ns clj-depend.parser
   (:require [clojure.tools.namespace.find :as namespace.find]
             [clojure.tools.namespace.parse :as namespace.parse]))
 

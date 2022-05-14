@@ -1,4 +1,4 @@
-(ns ^:no-doc clj-depend.internal-api
+(ns clj-depend.internal-api
   (:require [clj-depend.config :as config]
             [clj-depend.parser :as parser]
             [clj-depend.analyzer :as analyzer]
