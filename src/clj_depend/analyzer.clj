@@ -3,7 +3,7 @@
 
 (defn- layer-by-namespace
   [config namespace]
-  (first (filter #(re-find (re-pattern (get-in config [:layers % :defined-by])) namespace) (keys (:layers config)))))
+  (first (filter #(re-find (re-pattern (get-in config [:layers % :defined-by])) (str namespace)) (keys (:layers config)))))
 
 (defn- violate?
   [config
@@ -28,10 +28,10 @@
 
 (defn analyze
   "Analyze namespaces dependencies."
-  [config namespaces]
-  (let [dependency-graph (dependency/dependencies-graph namespaces)
-        violations (flatten (keep #(violations config dependency-graph (:name %)) namespaces))]
+  [{:keys [config namespaces dependency-graph]}]
+  (let [violations (flatten (keep #(violations config dependency-graph %) namespaces))]
     (map (fn [{:keys [namespace dependency-namespace]}]
            {:namespace namespace
-            :violation dependency-namespace})
+            :dependency-namespace dependency-namespace
+            :message (str \" namespace \" " should not depends on " \" dependency-namespace \")})
          violations)))

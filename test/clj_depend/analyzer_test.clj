@@ -1,18 +1,19 @@
 (ns clj-depend.analyzer-test
   (:require [clojure.test :refer :all]
-            [clj-depend.analyzer :as analyzer]))
+            [clj-depend.analyzer :as analyzer]
+            [clj-depend.dependency :as dependency]))
 
-(def namespace-a {:name         "foo.a.bar"
-                  :dependencies ["foo.b.bar" "foo.c.bar"]})
+(def ns-deps-a {:name         'foo.a.bar
+                :dependencies ['foo.b.bar 'foo.c.bar]})
 
-(def namespace-b {:name         "foo.b.bar"
-                  :dependencies []})
+(def ns-deps-b {:name         'foo.b.bar
+                :dependencies []})
 
-(def namespace-c {:name         "foo.c.bar"
-                  :dependencies []})
+(def ns-deps-c {:name         'foo.c.bar
+                :dependencies []})
 
-(def namespace-c-with-violation {:name         "foo.c.bar"
-                                 :dependencies ["foo.b.bar"]})
+(def ns-deps-c-with-violation {:name         'foo.c.bar
+                               :dependencies ['foo.b.bar]})
 
 (def config {:layers {:a {:defined-by         ".*\\.a\\..*"
                           :accessed-by-layers #{}}
@@ -21,17 +22,39 @@
                       :c {:defined-by         ".*\\.c\\..*"
                           :accessed-by-layers #{:a :b}}}})
 
-(def namespaces [namespace-a namespace-b namespace-c])
+(def ns-deps [ns-deps-a ns-deps-b ns-deps-c])
+(def namespaces (map :name ns-deps))
+(def dependency-graph (dependency/dependencies-graph ns-deps))
 
-(def namespaces-with-violations [namespace-a namespace-b namespace-c-with-violation])
+(def ns-deps-with-violations [ns-deps-a ns-deps-b ns-deps-c-with-violation])
+(def namespaces-with-violations (map :name ns-deps-with-violations))
+(def dependency-graph-with-violations (dependency/dependencies-graph ns-deps-with-violations))
 
 (deftest analyze-test
 
   (testing "should return zero violations when there is no forbidden access"
-    (let [violations (analyzer/analyze config namespaces)]
-      (is (= [] violations))))
+    (is (= []
+           (analyzer/analyze {:config           config
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph}))))
+
+  (testing "should return zero violations when there is no layers declared"
+    (is (= []
+           (analyzer/analyze {:config           {:layers {}}
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph}))))
+
+  (testing "should return zero violations when a namespace is accessed by unconfigured layers."
+    (is (= []
+           (analyzer/analyze {:config           {:layers {:c {:defined-by         ".*\\.c\\..*"
+                                                              :accessed-by-layers #{}}}}
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph}))))
 
   (testing "should return violations when there is any forbidden access"
-    (let [violations (analyzer/analyze config namespaces-with-violations)]
-      (is (= [{:namespace  "foo.c.bar"
-               :violation "foo.b.bar"}] violations)))))
+    (is (= [{:namespace 'foo.c.bar
+             :violation 'foo.b.bar}]
+           (analyzer/analyze {:config           config
+                              :namespaces       namespaces-with-violations
+                              :dependency-graph dependency-graph-with-violations}))))
+  )
