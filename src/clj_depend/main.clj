@@ -1,10 +1,9 @@
-(ns clj-depend.main
+(ns ^:no-doc clj-depend.main
   (:refer-clojure :exclude [run!])
   (:require [clj-depend.internal-api :as internal-api]
             [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
-            [clojure.string :as string])
-  {:no-doc true})
+            [clojure.string :as string]))
 
 (def cli-options
   [["-p" "--project-root PATH" "Specify the path to the project root to clj-depend consider during analysis."

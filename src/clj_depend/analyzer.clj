@@ -1,6 +1,5 @@
-(ns clj-depend.analyzer
-  (:require [clj-depend.dependency :as dependency])
-  {:no-doc true})
+(ns ^:no-doc clj-depend.analyzer
+  (:require [clj-depend.dependency :as dependency]))
 
 (defn- layer-by-namespace
   [config namespace]

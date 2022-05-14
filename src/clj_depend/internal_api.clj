@@ -1,11 +1,10 @@
-(ns clj-depend.internal-api
+(ns ^:no-doc clj-depend.internal-api
   (:require [clj-depend.config :as config]
             [clj-depend.parser :as parser]
             [clj-depend.analyzer :as analyzer]
             [clj-depend.dependency :as dependency]
             [clojure.string :as string]
-            [clojure.java.io :as io])
-  {:no-doc true})
+            [clojure.java.io :as io]))
 
 (defn- ->project-root
   [{:keys [project-root]} context]

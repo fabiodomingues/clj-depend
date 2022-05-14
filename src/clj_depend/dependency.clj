@@ -1,6 +1,5 @@
-(ns clj-depend.dependency
-  (:require [clojure.tools.namespace.dependency :as namespace.dependency])
-  {:no-doc true})
+(ns ^:no-doc clj-depend.dependency
+  (:require [clojure.tools.namespace.dependency :as namespace.dependency]))
 
 (defn dependencies-graph
   [namespaces]
