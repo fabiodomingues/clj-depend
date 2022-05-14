@@ -3,7 +3,8 @@
   (:require [clj-depend.internal-api :as internal-api]
             [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
-            [clojure.string :as string]))
+            [clojure.string :as string])
+  {:no-doc true})
 
 (def cli-options
   [["-p" "--project-root PATH" "Specify the path to the project root to clj-depend consider during analysis."

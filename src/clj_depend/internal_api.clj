@@ -4,7 +4,8 @@
             [clj-depend.analyzer :as analyzer]
             [clj-depend.dependency :as dependency]
             [clojure.string :as string]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io])
+  {:no-doc true})
 
 (defn- ->project-root
   [{:keys [project-root]} context]

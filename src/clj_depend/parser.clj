@@ -1,6 +1,7 @@
 (ns clj-depend.parser
   (:require [clojure.tools.namespace.find :as namespace.find]
-            [clojure.tools.namespace.parse :as namespace.parse]))
+            [clojure.tools.namespace.parse :as namespace.parse])
+  {:no-doc true})
 
 (defn parse-clojure-files!
   [files namespaces]

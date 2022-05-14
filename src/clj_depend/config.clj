@@ -1,7 +1,8 @@
 (ns clj-depend.config
   (:require [clojure.java.io :as io]
             [clojure.edn :as edn])
-  (:import (java.io PushbackReader)))
+  (:import (java.io PushbackReader))
+  {:no-doc true})
 
 (defn read!
   [project-dir]

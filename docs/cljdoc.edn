@@ -1,4 +1,3 @@
 {:cljdoc.doc/tree
- [["Readme" {:file "README.md"}]]
- :cljdoc/include-namespaces-from-dependencies
- [clj-depend/api]}
+ [["Readme" {:file "README.md"}]
+  ["Changes" {:file "CHANGELOG.md"}]]}

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 0.5.0 (2022-05-14)
+* Documentation improvements (cljdoc).
+
 ## 0.4.0 (2022-05-14)
 * Created an API for clj-depend.
 
