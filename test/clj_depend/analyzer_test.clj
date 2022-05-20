@@ -53,7 +53,8 @@
 
   (testing "should return violations when there is any forbidden access"
     (is (= [{:namespace 'foo.c.bar
-             :violation 'foo.b.bar}]
+             :dependency-namespace 'foo.b.bar
+             :message "\"foo.c.bar\" should not depends on \"foo.b.bar\""}]
            (analyzer/analyze {:config           config
                               :namespaces       namespaces-with-violations
                               :dependency-graph dependency-graph-with-violations}))))
