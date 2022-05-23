@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased
+
+* Fix violation when namespace depend on another on the same layer
+
 ## 0.5.0 (2022-05-14)
 * Documentation improvements (cljdoc).
 

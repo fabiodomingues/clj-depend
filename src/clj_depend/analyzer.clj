@@ -8,8 +8,9 @@
 (defn- violate?
   [config
    {:keys [layer dependency-layer]}]
-  (when-let [accessed-by-layers (get-in config [:layers dependency-layer :accessed-by-layers])]
-    (not-any? (partial = layer) accessed-by-layers)))
+  (and (not= layer dependency-layer)
+       (when-let [accessed-by-layers (get-in config [:layers dependency-layer :accessed-by-layers])]
+         (not-any? (partial = layer) accessed-by-layers))))
 
 (defn- layer-and-namespace [config namespace dependency-namespace]
   (when-let [layer (layer-by-namespace config namespace)]

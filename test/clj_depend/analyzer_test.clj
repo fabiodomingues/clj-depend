@@ -3,17 +3,19 @@
             [clj-depend.analyzer :as analyzer]
             [clj-depend.dependency :as dependency]))
 
-(def ns-deps-a {:name         'foo.a.bar
-                :dependencies ['foo.b.bar 'foo.c.bar]})
+(def ns-deps-a [{:name         'foo.a.bar
+                 :dependencies ['foo.b.bar 'foo.c.bar]}])
 
-(def ns-deps-b {:name         'foo.b.bar
-                :dependencies []})
+(def ns-deps-b [{:name         'foo.b.bar
+                 :dependencies ['foo.b.baz]}
+                {:name         'foo.b.baz
+                 :dependencies []}])
 
-(def ns-deps-c {:name         'foo.c.bar
-                :dependencies []})
+(def ns-deps-c [{:name         'foo.c.bar
+                 :dependencies []}])
 
-(def ns-deps-c-with-violation {:name         'foo.c.bar
-                               :dependencies ['foo.b.bar]})
+(def ns-deps-c-with-violation [{:name         'foo.c.bar
+                                :dependencies ['foo.b.bar]}])
 
 (def config {:layers {:a {:defined-by         ".*\\.a\\..*"
                           :accessed-by-layers #{}}
@@ -22,11 +24,11 @@
                       :c {:defined-by         ".*\\.c\\..*"
                           :accessed-by-layers #{:a :b}}}})
 
-(def ns-deps [ns-deps-a ns-deps-b ns-deps-c])
+(def ns-deps (concat ns-deps-a ns-deps-b ns-deps-c))
 (def namespaces (map :name ns-deps))
 (def dependency-graph (dependency/dependencies-graph ns-deps))
 
-(def ns-deps-with-violations [ns-deps-a ns-deps-b ns-deps-c-with-violation])
+(def ns-deps-with-violations (concat ns-deps-a ns-deps-b ns-deps-c-with-violation))
 (def namespaces-with-violations (map :name ns-deps-with-violations))
 (def dependency-graph-with-violations (dependency/dependencies-graph ns-deps-with-violations))
 
