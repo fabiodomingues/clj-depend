@@ -24,6 +24,15 @@
                       :c {:defined-by         ".*\\.c\\..*"
                           :accessed-by-layers #{:a :b}}}})
 
+(def config-with-namespaced-layers {:layers {:a {:defined-by         #{"foo.a.bar"}
+                                                 :namespaced true
+                                                 :accessed-by-layers #{}}
+                                             :b {:defined-by         #{"foo.b.bar" "foo.b.baz"}
+                                                 :namespaced true
+                                                 :accessed-by-layers #{:a}}
+                                             :c {:defined-by         ".*\\.c\\..*"
+                                                 :accessed-by-layers #{:a :b}}}})
+
 (def ns-deps (concat ns-deps-a ns-deps-b ns-deps-c))
 (def namespaces (map :name ns-deps))
 (def dependency-graph (dependency/dependencies-graph ns-deps))
@@ -59,5 +68,20 @@
              :message "\"foo.c.bar\" should not depends on \"foo.b.bar\""}]
            (analyzer/analyze {:config           config
                               :namespaces       namespaces-with-violations
-                              :dependency-graph dependency-graph-with-violations}))))
-  )
+                              :dependency-graph dependency-graph-with-violations})))))
+
+(deftest analyze-namespaced-test
+
+  (testing "should return zero violations when there is no forbidden access"
+    (is (= []
+           (analyzer/analyze {:config           config-with-namespaced-layers
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph}))))
+
+  (testing "should return violations when there is any forbidden access"
+    (is (= [{:namespace 'foo.c.bar
+             :dependency-namespace 'foo.b.bar
+             :message "\"foo.c.bar\" should not depends on \"foo.b.bar\""}]
+           (analyzer/analyze {:config           config-with-namespaced-layers
+                              :namespaces       namespaces-with-violations
+                              :dependency-graph dependency-graph-with-violations})))))

@@ -1,9 +1,19 @@
 (ns clj-depend.analyzer
   (:require [clj-depend.dependency :as dependency]))
 
+
+(defn- filter-by-kind
+  [layer-key config namespace]
+ (let [layer (get-in config [:layers layer-key])
+       namespaced? (:namespaced layer)
+       defined-by (get-in config [:layers layer-key :defined-by])]
+   (if namespaced?
+     (some #{(str namespace)} defined-by)
+     (re-find (re-pattern defined-by) (str namespace)))))
+
 (defn- layer-by-namespace
   [config namespace]
-  (first (filter #(re-find (re-pattern (get-in config [:layers % :defined-by])) (str namespace)) (keys (:layers config)))))
+  (first (filter #(filter-by-kind % config namespace) (keys (:layers config)))))
 
 (defn- violate?
   [config
@@ -22,6 +32,7 @@
 (defn- violations
   [config dependency-graph namespace]
   (let [dependencies (dependency/immediate-dependencies dependency-graph namespace)]
+
     (->> dependencies
          (map #(layer-and-namespace config namespace %))
          (filter #(violate? config %))
