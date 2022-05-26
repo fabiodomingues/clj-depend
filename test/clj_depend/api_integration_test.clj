@@ -127,8 +127,7 @@
                            :message              "\"sample.controller.foo\" should not depends on \"sample.logic.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations-namespaced"))
                          :config       {:source-paths #{"src"}
-                                        :layers       {:controller {:defined-by         #{"sample.controller.foo"}
-                                                                    :namespaced true
+                                        :layers       {:controller {:namespaces         #{'sample.controller.foo}
                                                                     :accessed-by-layers #{}}
                                                        :logic      {:defined-by         ".*\\.logic\\..*"
                                                                     :accessed-by-layers #{}}}}}))))
@@ -138,8 +137,7 @@
             :message     "No violations found!"}
            (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
                          :config       {:source-paths #{"src"}
-                                        :layers       {:controller {:defined-by         #{"sample.controller.foo"}
-                                                                    :namespaced true
+                                        :layers       {:controller {:namespaces         #{'sample.controller.foo}
                                                                     :accessed-by-layers #{:logic}}
                                                        :logic      {:defined-by         ".*\\.logic\\..*"
                                                                     :accessed-by-layers #{}}}}}))))

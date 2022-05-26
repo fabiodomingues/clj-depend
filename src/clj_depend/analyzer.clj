@@ -1,19 +1,16 @@
 (ns clj-depend.analyzer
   (:require [clj-depend.dependency :as dependency]))
 
-
-(defn- filter-by-kind
-  [layer-key config namespace]
- (let [layer (get-in config [:layers layer-key])
-       namespaced? (:namespaced layer)
-       defined-by (get-in config [:layers layer-key :defined-by])]
-   (if namespaced?
-     (some #{(str namespace)} defined-by)
-     (re-find (re-pattern defined-by) (str namespace)))))
+(defn- namespace-belongs-to-layer?
+  [config namespace layer]
+  (let [namespaces (get-in config [:layers layer :namespaces])
+        defined-by (get-in config [:layers layer :defined-by])]
+    (or (some #{namespace}  namespaces)
+        (when defined-by (re-find (re-pattern defined-by) (str namespace))))))
 
 (defn- layer-by-namespace
   [config namespace]
-  (first (filter #(filter-by-kind % config namespace) (keys (:layers config)))))
+  (some #(when (namespace-belongs-to-layer? config namespace %) %) (keys (:layers config))))
 
 (defn- violate?
   [config

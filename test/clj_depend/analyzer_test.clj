@@ -24,11 +24,9 @@
                       :c {:defined-by         ".*\\.c\\..*"
                           :accessed-by-layers #{:a :b}}}})
 
-(def config-with-namespaced-layers {:layers {:a {:defined-by         #{"foo.a.bar"}
-                                                 :namespaced true
+(def config-with-namespaced-layers {:layers {:a {:namespaces         #{'foo.a.bar}
                                                  :accessed-by-layers #{}}
-                                             :b {:defined-by         #{"foo.b.bar" "foo.b.baz"}
-                                                 :namespaced true
+                                             :b {:namespaces         #{'foo.b.bar 'foo.b.baz}
                                                  :accessed-by-layers #{:a}}
                                              :c {:defined-by         ".*\\.c\\..*"
                                                  :accessed-by-layers #{:a :b}}}})
