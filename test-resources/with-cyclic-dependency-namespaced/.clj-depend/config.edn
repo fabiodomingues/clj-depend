@@ -1,0 +1,5 @@
+{:source-paths #{"src"}
+ :layers {:controller {:namespaces         #{sample.controller.foo}
+                       :accessed-by-layers #{}}
+          :logic      {:defined-by         ".*\\.logic\\..*"
+                       :accessed-by-layers #{:controller}}}}

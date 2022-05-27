@@ -103,3 +103,84 @@
             :message     "Circular dependency between sample.logic.foo and sample.controller.foo"}
            (api/analyze {:project-root (io/file (io/resource "with-cyclic-dependency"))
                          :source-paths #{"src"}})))))
+
+(deftest analyze-namespaced
+
+  (testing "should succeed when there are no violations"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "without-violations-namespaced"))}))))
+
+  (testing "should fail when there is at least one violation"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))}))))
+
+  (testing "should fail when given a different configuration as a parameter"
+    (is (= {:result-code 1
+            :message     "\"sample.controller.foo\" should not depends on \"sample.logic.foo\""
+            :violations  [{:namespace            'sample.controller.foo
+                           :dependency-namespace 'sample.logic.foo
+                           :message              "\"sample.controller.foo\" should not depends on \"sample.logic.foo\""}]}
+           (api/analyze {:project-root (io/file (io/resource "without-violations-namespaced"))
+                         :config       {:source-paths #{"src"}
+                                        :layers       {:controller {:namespaces         #{'sample.controller.foo}
+                                                                    :accessed-by-layers #{}}
+                                                       :logic      {:defined-by         ".*\\.logic\\..*"
+                                                                    :accessed-by-layers #{}}}}}))))
+
+  (testing "should succeed when given a different configuration as a parameter"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :config       {:source-paths #{"src"}
+                                        :layers       {:controller {:namespaces         #{'sample.controller.foo}
+                                                                    :accessed-by-layers #{:logic}}
+                                                       :logic      {:defined-by         ".*\\.logic\\..*"
+                                                                    :accessed-by-layers #{}}}}}))))
+
+  (testing "should succeed when the namespace that has the violation is not included in the analysis"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :namespaces   #{'sample.controller.foo}}))))
+
+  (testing "should fail even when only the namespace that has the violation is included in the analysis."
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :namespaces   #{'sample.logic.foo}}))))
+
+  (testing "should succeed when the files that has the violation is not included in the analysis"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :files        #{(io/file (io/resource "with-violations-namespaced/src/sample/controller/foo.clj"))}}))))
+
+  (testing "should fail even when only the files that has the violation is included in the analysis."
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :violations  [{:namespace 'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :message "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :files        #{(io/file (io/resource "with-violations-namespaced/src/sample/logic/foo.clj"))}}))))
+
+  (testing "should succeed when the files that has the violation is included but namespace that has the violation is not included in the analysis"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-namespaced"))
+                         :files        #{(io/file (io/resource "with-violations-namespaced/src/sample/logic/foo.clj"))}
+                         :namespaces   #{'sample.controller.foo}}))))
+
+  (testing "should fail when a cyclic dependency is identified"
+    (is (= {:result-code 2
+            :message     "Circular dependency between sample.logic.foo and sample.controller.foo"}
+           (api/analyze {:project-root (io/file (io/resource "with-cyclic-dependency-namespaced"))
+                         :source-paths #{"src"}})))))
