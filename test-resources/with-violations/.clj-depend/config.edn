@@ -1,5 +1,7 @@
 {:source-paths #{"src"}
- :layers {:controller {:defined-by         ".*\\.controller\\..*"
-                       :accessed-by-layers #{}}
-          :logic      {:defined-by         ".*\\.logic\\..*"
-                       :accessed-by-layers #{:controller}}}}
+ :layers       {:server     {:namespaces         #{sample.server}
+                             :accessed-by-layers #{}}
+                :controller {:defined-by         ".*\\.controller\\..*"
+                             :accessed-by-layers #{:server}}
+                :logic      {:defined-by         ".*\\.logic\\..*"
+                             :accessed-by-layers #{:controller}}}}

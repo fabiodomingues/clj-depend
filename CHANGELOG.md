@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-* Fix violation when namespace depend on another on the same layer
+* Fix violation when namespace depend on another on the same layer.
+* Declaring namespaces directly in layer configuration without regex.
 
 ## 0.5.0 (2022-05-14)
 * Documentation improvements (cljdoc).

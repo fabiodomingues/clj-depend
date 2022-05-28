@@ -1,1 +1,0 @@
-(ns sample.controller.foo)
