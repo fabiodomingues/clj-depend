@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.6.0 (2022-06-01)
+
 * Fix violation when namespace depend on another on the same layer.
 * Declaring namespaces directly in layer configuration without regex.
 
