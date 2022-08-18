@@ -1,0 +1,14 @@
+{:source-paths #{"src"}
+ :layers       {:module1-server     {:namespaces         #{module1.server}
+                                     :accessed-by-layers #{}}
+                :module1-controller {:defined-by         "module1\\.controller\\..*"
+                                     :accessed-by-layers #{:module1-server}}
+                :module1-logic      {:defined-by         "module1\\.logic\\..*"
+                                     :accessed-by-layers #{:module1-controller}}
+                :module2-server     {:namespaces         #{module2.server}
+                                     :accessed-by-layers #{}}
+                :module2-controller {:defined-by         "module2\\.controller\\..*"
+                                     :accessed-by-layers #{:module2-server}}
+                :module2-logic      {:defined-by         "module2\\.logic\\..*"
+                                     :accessed-by-layers #{:module2-controller}}}
+ }
