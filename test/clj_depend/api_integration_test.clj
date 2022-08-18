@@ -91,9 +91,9 @@
   (testing "should fail even when only the files that has the violation is included in the analysis."
     (is (= {:result-code 1
             :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
-            :violations  [{:namespace 'sample.logic.foo
+            :violations  [{:namespace            'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
-                           :message "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :files        #{(io/file (io/resource "with-violations/src/sample/logic/foo.clj"))}})))))
 
@@ -104,3 +104,17 @@
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :files        #{(io/file (io/resource "with-violations/src/sample/logic/foo.clj"))}
                          :namespaces   #{'sample.controller.foo}})))))
+
+(deftest analyze-project-with-modular-structure
+  (testing "should succeed when the files from a module doesn't access other module"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "without-violations-for-modular-structure"))}))))
+
+  (testing "should fail when the files from a module access other module"
+    (is (= {:result-code 1
+            :message     "\"module1.controller.foo\" should not depends on \"module2.logic.foo\""
+            :violations  [{:namespace            'module1.controller.foo
+                           :dependency-namespace 'module2.logic.foo
+                           :message              "\"module1.controller.foo\" should not depends on \"module2.logic.foo\""}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-for-modular-structure"))})))))
