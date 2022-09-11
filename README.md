@@ -8,7 +8,7 @@ A Clojure namespace dependency analyzer.
 
 ### Leiningen
 
-To run clj-depend from Leiningen, check [lein-clj-depend](https://github.com/clj-depend/lein-clj-depend) plugin.
+To run clj-depend from Leiningen, check [lein-clj-depend](./lein-clj-depend/README.md) plugin.
 
 ### Clojure CLI (tools.deps)
 
