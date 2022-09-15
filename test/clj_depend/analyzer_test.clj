@@ -53,10 +53,18 @@
                               :namespaces       namespaces
                               :dependency-graph dependency-graph}))))
 
-  (testing "should return zero violations when a namespace is accessed by unconfigured layers."
+  (testing "should return zero violations when a namespace is accessed by unconfigured layers"
     (is (= []
            (analyzer/analyze {:config           {:layers {:c {:defined-by         ".*\\.c\\..*"
                                                               :accessed-by-layers #{}}}}
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph}))))
+
+  (testing "should return violations when a namespace is accessed by another namespace on the same layer and the configuration does not allow this"
+    (is (= [{:namespace 'foo.b.bar
+             :dependency-namespace 'foo.b.baz
+             :message "\"foo.b.bar\" should not depends on \"foo.b.baz\""}]
+           (analyzer/analyze {:config           (assoc-in config [:layers :b :internal-dependency] false)
                               :namespaces       namespaces
                               :dependency-graph dependency-graph}))))
 
