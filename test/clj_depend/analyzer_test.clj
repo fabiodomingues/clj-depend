@@ -83,3 +83,49 @@
            (analyzer/analyze {:config           config-with-namespaces
                               :namespaces       namespaces-with-violations
                               :dependency-graph dependency-graph-with-violations})))))
+
+(deftest analyze-config-with-modules-test
+  (testing "should return violations when there is any forbidden access"
+    (let [config {:modules {:module-a {:defined-by "module-a\\..*"}
+                            :module-b {:defined-by "module-b\\..*"}}
+                  :layers  {:layer-a {:defined-by         ".*\\.layer-a\\..*"
+                                      :accessed-by-layers #{}}
+                            :layer-b {:defined-by         ".*\\.layer-b\\..*"
+                                      :accessed-by-layers #{:layer-a}}}}
+          ns-deps [{:name 'module-a.layer-a.foo :dependencies ['module-a.layer-b.bar]}
+                         {:name 'module-a.layer-b.bar :dependencies []}
+                         {:name 'module-b.layer-a.foo :dependencies ['module-b.layer-b.bar]}
+                         {:name 'module-b.layer-b.bar :dependencies []}]
+          namespaces (map :name ns-deps)
+          dependency-graph (dependency/dependencies-graph ns-deps)]
+
+      (is (= []
+             (analyzer/analyze {:config           config
+                                :namespaces       namespaces
+                                :dependency-graph dependency-graph})))))
+
+  (testing "should return violations when there is any forbidden access"
+    (let [config {:modules {:module-a {:defined-by "module-a\\..*"}
+                            :module-b {:defined-by "module-b\\..*"}}
+                  :layers  {:layer-a {:defined-by         ".*\\.layer-a\\..*"
+                                      :accessed-by-layers #{}}
+                            :layer-b {:defined-by         ".*\\.layer-b\\..*"
+                                      :accessed-by-layers #{:layer-a}}}}
+          ns-deps [{:name 'module-a.layer-a.foo :dependencies ['module-a.layer-b.bar]}
+                   {:name 'module-a.layer-b.bar :dependencies []}
+                   {:name 'module-b.layer-a.foo :dependencies ['module-b.layer-b.bar]}
+                   {:name 'module-b.layer-b.bar :dependencies ['module-a.layer-b.bar]}]
+          namespaces (map :name ns-deps)
+          dependency-graph (dependency/dependencies-graph ns-deps)]
+
+      (is (= [{:namespace            'module-b.layer-b.bar
+               :dependency-namespace 'module-a.layer-b.bar
+               :message              "\"module-b.layer-b.bar\" should not depends on \"module-a.layer-b.bar\""}]
+             (analyzer/analyze {:config           config
+                                :namespaces       namespaces
+                                :dependency-graph dependency-graph}))))))
+
+
+; Como definir quando um módulo é comum?
+; Como definir quando um módulo é o main e vê todos os outros?
+; Caso onde uma camada do module-a é acessado por 1 ou mais camadas do modulo-b
