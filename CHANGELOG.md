@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix violation message from `should not depends on` to `should not depend on`.
+
 ## 0.6.0 (2022-06-01)
 
 * Fix violation when namespace depend on another on the same layer.
