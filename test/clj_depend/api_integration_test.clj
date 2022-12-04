@@ -28,19 +28,19 @@
 (deftest analyze-project-with-violation
   (testing "should fail when there is at least one violation"
     (is (= {:result-code 1
-            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""
             :violations  [{:namespace            'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
-                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))})))))
 
 (deftest analyze-project-with-custom-config
   (testing "should fail when given a different configuration as a parameter"
     (is (= {:result-code 1
-            :message     "\"sample.server\" should not depends on \"sample.controller.foo\""
+            :message     "\"sample.server\" should not depend on \"sample.controller.foo\""
             :violations  [{:namespace            'sample.server
                            :dependency-namespace 'sample.controller.foo
-                           :message              "\"sample.server\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
                          :config       (-> (config/read! (io/file (io/resource "without-violations")))
                                            (assoc-in [:layers :controller :accessed-by-layers] #{}))}))))
@@ -56,10 +56,10 @@
 
   (testing "should fail when given a different configuration as a parameter without source-paths"
     (is (= {:result-code 1
-            :message     "\"sample.server\" should not depends on \"sample.controller.foo\""
+            :message     "\"sample.server\" should not depend on \"sample.controller.foo\""
             :violations  [{:namespace            'sample.server
                            :dependency-namespace 'sample.controller.foo
-                           :message              "\"sample.server\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
                          :config       (-> (config/read! (io/file (io/resource "without-violations")))
                                            (dissoc :source-paths)
@@ -74,10 +74,10 @@
 
   (testing "should fail even when only the namespace that has the violation is included in the analysis."
     (is (= {:result-code 1
-            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""
             :violations  [{:namespace            'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
-                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :namespaces   #{'sample.logic.foo}})))))
 
@@ -90,10 +90,10 @@
 
   (testing "should fail even when only the files that has the violation is included in the analysis."
     (is (= {:result-code 1
-            :message     "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""
             :violations  [{:namespace            'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
-                           :message              "\"sample.logic.foo\" should not depends on \"sample.controller.foo\""}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :files        #{(io/file (io/resource "with-violations/src/sample/logic/foo.clj"))}})))))
 
@@ -113,8 +113,8 @@
 
   (testing "should fail when the files from a module access other module"
     (is (= {:result-code 1
-            :message     "\"module1.controller.foo\" should not depends on \"module2.logic.foo\""
+            :message     "\"module1.controller.foo\" should not depend on \"module2.logic.foo\""
             :violations  [{:namespace            'module1.controller.foo
                            :dependency-namespace 'module2.logic.foo
-                           :message              "\"module1.controller.foo\" should not depends on \"module2.logic.foo\""}]}
+                           :message              "\"module1.controller.foo\" should not depend on \"module2.logic.foo\""}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-for-modular-structure"))})))))

@@ -42,5 +42,5 @@
     (map (fn [{:keys [namespace dependency-namespace]}]
            {:namespace namespace
             :dependency-namespace dependency-namespace
-            :message (str \" namespace \" " should not depends on " \" dependency-namespace \")})
+            :message (str \" namespace \" " should not depend on " \" dependency-namespace \")})
          violations)))
