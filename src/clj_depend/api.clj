@@ -29,8 +29,8 @@
   ```clojure
   (clj-depend.api/analyze {:project-root (io/file \".\")
                            :config {:source-paths #{\"src\"
-                                    :layers {:foo {:defined-by \"foo\\..*\" :accessed-by-layers #{}}
-                                             :bar {:defined-by \"bar\\..*\" :accessed-by-layers #{:foo}}}}}
+                                    :layers {:foo {:defined-by \"foo\\..*\" :accesses-layers #{:bar}}
+                                             :bar {:defined-by \"bar\\..*\" :accesses-layers #{}}}}}
                            :namespaces #{foo.x bar.y}})
   ```"
   [{:keys [project-root config files namespaces] :as options}]

@@ -50,9 +50,9 @@ Configuration file (`.clj-depend/config.edn`) for diagram above:
 ```clojure
 {:source-paths #{"src"}
  :layers {:controller {:defined-by         ".*\\.controller\\..*"
-                       :accessed-by-layers #{}}
+                       :accesses-layers #{:logic :model}}
           :logic      {:defined-by         ".*\\.logic\\..*"
-                       :accessed-by-layers #{:controller}}
+                       :accesses-layers #{:model}}
           :model      {:defined-by         ".*\\.model\\..*"
-                       :accessed-by-layers #{:logic :controller}}}}
+                       :accesses-layers #{}}}}
 ```
