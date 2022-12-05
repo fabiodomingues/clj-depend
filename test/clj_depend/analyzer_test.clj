@@ -79,7 +79,14 @@
                                                           :c {:defined-by         ".*\\.c\\..*"
                                                               :accesses-layers #{}}}}
                               :namespaces       namespaces-with-violations
-                              :dependency-graph dependency-graph-with-violations})))))
+                              :dependency-graph dependency-graph-with-violations}))))
+
+  (testing "should return zero violations when layer dependencies are not covered by any other layer"
+    (is (= []
+           (analyzer/analyze {:config           {:layers {:a {:namespaces #{'foo.a.bar}
+                                                              :accessed-by-layers #{}}}}
+                              :namespaces       namespaces
+                              :dependency-graph dependency-graph})))))
 
 (deftest analyze-config-with-namespaces-test
 
