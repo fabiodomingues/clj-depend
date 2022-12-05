@@ -12,22 +12,22 @@
   [config namespace]
   (some #(when (namespace-belongs-to-layer? config namespace %) %) (keys (:layers config))))
 
-(defn- dependency-layer-can-be-accessed-by-layer?
+(defn- dependency-layer-cannot-be-accessed-by-layer?
   [config dependency-layer layer]
   (when-let [accessed-by-layers (get-in config [:layers dependency-layer :accessed-by-layers])]
-    (some (partial = layer) accessed-by-layers)))
+    (not-any? (partial = layer) accessed-by-layers)))
 
-(defn- layer-can-access-dependency-layer?
+(defn- layer-cannot-access-dependency-layer?
   [config layer dependency-layer]
   (when-let [accesses-layers (get-in config [:layers layer :accesses-layers])]
-    (some (partial = dependency-layer) accesses-layers)))
+    (not-any? (partial = dependency-layer) accesses-layers)))
 
 (defn- violate?
   [config
    {:keys [layer dependency-layer]}]
   (and (not= layer dependency-layer)
-       (not (or (dependency-layer-can-be-accessed-by-layer? config dependency-layer layer)
-                (layer-can-access-dependency-layer? config layer dependency-layer)))))
+       (or (dependency-layer-cannot-be-accessed-by-layer? config dependency-layer layer)
+           (layer-cannot-access-dependency-layer? config layer dependency-layer))))
 
 (defn- layer-and-namespace [config namespace dependency-namespace]
   (when-let [layer (layer-by-namespace config namespace)]
