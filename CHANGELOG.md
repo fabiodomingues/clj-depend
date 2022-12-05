@@ -4,6 +4,7 @@
 
 * [#28](https://github.com/fabiodomingues/clj-depend/issues/28): fix violation message from `should not depends on` to `should not depend on`.
 * [#26](https://github.com/fabiodomingues/clj-depend/issues/26): add the `:accesses-layers` option to define the dependencies of a layer in the natural order instead of `:accessed-by-layers`.
+* [#31](https://github.com/fabiodomingues/clj-depend/issues/31): fix regression reporting false positives for namespaces that are not covered by any other layer
 
 ## 0.6.0 (2022-06-01)
 
