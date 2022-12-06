@@ -63,7 +63,9 @@
   (testing "should return violations when there is any forbidden access"
     (is (= [{:namespace 'foo.c.bar
              :dependency-namespace 'foo.b.bar
-             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\""}]
+             :layer :c
+             :dependency-layer :b
+             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
            (analyzer/analyze {:config           config
                               :namespaces       namespaces-with-violations
                               :dependency-graph dependency-graph-with-violations}))))
@@ -71,7 +73,9 @@
   (testing "should return violations when there is any forbidden access when using :access-layers instead of :accessed-by-layers"
     (is (= [{:namespace 'foo.c.bar
              :dependency-namespace 'foo.b.bar
-             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\""}]
+             :layer :c
+             :dependency-layer :b
+             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
            (analyzer/analyze {:config           {:layers {:a {:defined-by         ".*\\.a\\..*"
                                                               :accesses-layers #{:b :c}}
                                                           :b {:defined-by         ".*\\.b\\..*"
@@ -99,7 +103,9 @@
   (testing "should return violations when there is any forbidden access"
     (is (= [{:namespace 'foo.c.bar
              :dependency-namespace 'foo.b.bar
-             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\""}]
+             :layer :c
+             :dependency-layer :b
+             :message "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
            (analyzer/analyze {:config           config-with-namespaces
                               :namespaces       namespaces-with-violations
                               :dependency-graph dependency-graph-with-violations})))))

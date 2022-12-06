@@ -49,8 +49,10 @@
   "Analyze namespaces dependencies."
   [{:keys [config namespaces dependency-graph]}]
   (let [violations (flatten (keep #(violations config dependency-graph %) namespaces))]
-    (map (fn [{:keys [namespace dependency-namespace]}]
+    (map (fn [{:keys [namespace dependency-namespace layer dependency-layer]}]
            {:namespace namespace
             :dependency-namespace dependency-namespace
-            :message (str \" namespace \" " should not depend on " \" dependency-namespace \")})
+            :layer layer
+            :dependency-layer dependency-layer
+            :message (str \" namespace \" " should not depend on " \" dependency-namespace \" " (layer " \" layer \" " on " \" dependency-layer \" ")")})
          violations)))
