@@ -7,9 +7,9 @@
 
   Takes a map with:
 
-  - `:project-root` required, a java.io.File representing the project root.
+  - `:project-root` required, a java.io.File representing the project root directory.
 
-  - `:config` optional, a configuration map. Otherwise, it will try to resolve the configuration using `.clj-depend/config.edn` in `:project-root` directory.
+  - `:config` optional, a configuration map that will be merged with default configs and configuration file (`.clj-depend/config.edn`) when present in the `:project-root` directory.
 
   - `:files` optional, a set of files or directories (java.io.File) representing files to be analyzed. If empty, all files in source paths declared in config will be considered.
 
