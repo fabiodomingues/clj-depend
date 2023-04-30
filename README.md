@@ -34,6 +34,8 @@ You can use the namespace [clj-depend.api](https://cljdoc.org/d/com.fabiodomingu
 
 To let clj-depend know the existing layers in your application and the allowed dependencies between these layers, create a `.clj-depend` directory at the root of the project and inside it a `config.edn` file.
 
+[More details](./docs/config.md).
+
 ### Layer Checks
 
 Diagram to exemplify the dependency between layers:

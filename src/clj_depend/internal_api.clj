@@ -1,20 +1,19 @@
 (ns clj-depend.internal-api
-  (:require [clj-depend.config :as config]
-            [clj-depend.parser :as parser]
-            [clj-depend.analyzer :as analyzer]
+  (:require [clj-depend.analyzer :as analyzer]
+            [clj-depend.config :as config]
             [clj-depend.dependency :as dependency]
-            [clojure.string :as string]
-            [clojure.java.io :as io]))
+            [clj-depend.parser :as parser]
+            [clojure.java.io :as io]
+            [clojure.string :as string]))
 
 (defn- ->project-root
   [{:keys [project-root]} context]
   (assoc context :project-root project-root))
 
 (defn- ->config
-  [{:keys [config]} context]
-  (if (map? config)
-    (assoc context :config config)
-    (assoc context :config (config/read! (:project-root context)))))
+  [{:keys [config]}
+   {:keys [project-root] :as context}]
+  (assoc context :config (config/resolve-config! project-root config)))
 
 (defn- ->files
   [{:keys [files]}

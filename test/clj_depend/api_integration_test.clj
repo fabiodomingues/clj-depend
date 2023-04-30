@@ -1,6 +1,5 @@
 (ns clj-depend.api-integration-test
   (:require [clj-depend.api :as api]
-            [clj-depend.config :as config]
             [clojure.java.io :as io]
             [clojure.test :refer :all]))
 
@@ -46,17 +45,23 @@
                            :dependency-layer     :controller
                            :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
-                         :config       (-> (config/read! (io/file (io/resource "without-violations")))
-                                           (assoc-in [:layers :controller :accessed-by-layers] #{}))}))))
+                         :config       {:layers {:server     {:namespaces         #{'sample.server}
+                                                              :accessed-by-layers #{}}
+                                                 :controller {:defined-by         ".*\\.controller\\..*"
+                                                              :accessed-by-layers #{}}
+                                                 :logic      {:defined-by         ".*\\.logic\\..*"
+                                                              :accessed-by-layers #{:controller}}}}}))))
 
   (testing "should succeed when given a different configuration as a parameter"
     (is (= {:result-code 0
             :message     "No violations found!"}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
-                         :config       {:source-paths #{"src"}
-                                        :layers       (-> (config/read! (io/file (io/resource "with-violations")))
-                                                          (assoc-in [:layers :controller :accessed-by-layers] #{:logic})
-                                                          (assoc-in [:layers :logic :accessed-by-layers] #{}))}}))))
+                         :config       {:layers {:server     {:namespaces         #{'sample.server}
+                                                              :accessed-by-layers #{}}
+                                                 :controller {:defined-by         ".*\\.controller\\..*"
+                                                              :accessed-by-layers #{:logic :server}}
+                                                 :logic      {:defined-by         ".*\\.logic\\..*"
+                                                              :accessed-by-layers #{}}}}}))))
 
   (testing "should fail when given a different configuration as a parameter without source-paths"
     (is (= {:result-code 1
@@ -67,9 +72,13 @@
                            :dependency-layer     :controller
                            :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
-                         :config       (-> (config/read! (io/file (io/resource "without-violations")))
-                                           (dissoc :source-paths)
-                                           (assoc-in [:layers :controller :accessed-by-layers] #{}))})))))
+                         :config       {:source-paths #{}
+                                        :layers       {:server     {:namespaces         #{'sample.server}
+                                                                    :accessed-by-layers #{}}
+                                                       :controller {:defined-by         ".*\\.controller\\..*"
+                                                                    :accessed-by-layers #{}}
+                                                       :logic      {:defined-by         ".*\\.logic\\..*"
+                                                                    :accessed-by-layers #{:controller}}}}})))))
 
 (deftest analyze-project-with-specific-namespace
   (testing "should succeed when the namespace that has the violation is not included in the analysis"
