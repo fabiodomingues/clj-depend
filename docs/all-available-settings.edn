@@ -1,3 +1,0 @@
-;; All available settings and its default values
-{:source-paths #{"src"}
- :layers       {}}
