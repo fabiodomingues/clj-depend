@@ -25,6 +25,8 @@ Default: `#{"src"}`.
 
 Defining the layers of your project.
 
+Default: `{}`.
+
 A map where each key is a layer and the value is a map, where:
 - The layer is defined by a regex using the `:defined-by` key or a set of namespaces using the `:namespaces` key.
 - The accesses allowed by it declared using the `:accesses-layers` key, or the accesses that are allowed to the layer using the `:accessed-by-layers` key. Since both keys accept a set of layers.
