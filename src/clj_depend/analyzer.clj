@@ -3,8 +3,8 @@
 
 (defn- layer-cannot-access-dependency-layer?
   [config layer dependency-layer]
-  (when-let [accesses-layers (get-in config [:layers layer :accesses-layers])]
-    (not-any? (partial = dependency-layer) accesses-layers)))
+  (when-let [access-layers (get-in config [:layers layer :access-layers])]
+    (not-any? (partial = dependency-layer) access-layers)))
 
 (defn- dependency-layer-cannot-be-accessed-by-layer?
   [config dependency-layer layer]

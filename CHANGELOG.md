@@ -2,11 +2,12 @@
 
 ## Unreleased
 
-* [#33](https://github.com/fabiodomingues/clj-depend/issues/33): Merge default configuration, project configuration and configurations passed as parameter.
-* [#28](https://github.com/fabiodomingues/clj-depend/issues/28): fix violation message from `should not depends on` to `should not depend on`.
-* [#26](https://github.com/fabiodomingues/clj-depend/issues/26): add the `:accesses-layers` option to define the dependencies of a layer in the natural order instead of `:accessed-by-layers`.
-* [#31](https://github.com/fabiodomingues/clj-depend/issues/31): fix regression reporting false positives for namespaces that are not covered by any other layer.
-* [#27](https://github.com/fabiodomingues/clj-depend/issues/27): print violated layers.
+* Fix typo from `accesses-layers` to `access-layers`.
+* Merge default configuration, project configuration and configurations passed as parameter. [#33](https://github.com/fabiodomingues/clj-depend/issues/33)
+* Fix violation message from `should not depends on` to `should not depend on`. [#28](https://github.com/fabiodomingues/clj-depend/issues/28)
+* Add the `:accesses-layers` option to define the dependencies of a layer in the natural order instead of `:accessed-by-layers`. [#26](https://github.com/fabiodomingues/clj-depend/issues/26)
+* Fix regression reporting false positives for namespaces that are not covered by any other layer. [#31](https://github.com/fabiodomingues/clj-depend/issues/31)
+* Print violated layers. [#27](https://github.com/fabiodomingues/clj-depend/issues/27)
 
 ## 0.6.0 (2022-06-01)
 
