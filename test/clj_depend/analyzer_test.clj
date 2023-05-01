@@ -77,11 +77,11 @@
              :dependency-layer :b
              :message "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
            (analyzer/analyze {:config           {:layers {:a {:defined-by         ".*\\.a\\..*"
-                                                              :accesses-layers #{:b :c}}
+                                                              :access-layers #{:b :c}}
                                                           :b {:defined-by         ".*\\.b\\..*"
-                                                              :accesses-layers #{:c}}
+                                                              :access-layers #{:c}}
                                                           :c {:defined-by         ".*\\.c\\..*"
-                                                              :accesses-layers #{}}}}
+                                                              :access-layers #{}}}}
                               :namespaces       namespaces-with-violations
                               :dependency-graph dependency-graph-with-violations}))))
 
