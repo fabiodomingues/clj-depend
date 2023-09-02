@@ -3,6 +3,7 @@
             [clj-depend.config :as config]
             [clj-depend.dependency :as dependency]
             [clj-depend.parser :as parser]
+            [clj-depend.snapshot :as snapshot]
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
@@ -44,7 +45,9 @@
   [options]
   (try
     (let [context (build-context options)
-          violations (analyzer/analyze context)]
+          violations (analyzer/analyze context)
+          _ (snapshot/dump-when-enabled! violations options)
+          violations (snapshot/without-violations-present-in-snapshot-file! violations options)]
       (if (seq violations)
         {:result-code 1
          :message     (string/join "\n" (map :message violations))

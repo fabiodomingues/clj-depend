@@ -15,6 +15,8 @@
 
   - `:namespaces` optional, a set of symbols representing namespaces to be analyzed. If empty, all project namespaces will be considered.
 
+  - `:snapshot?` a boolean, when enable analyze namespace dependencies and dump the violations into a snapshot file (`.clj-depend/violations.edn`) that is used as a reference for further analysis.
+
   Returns a map with:
 
   - `:result-code` required, an integer:
