@@ -9,7 +9,7 @@
           ["--project-root" root]))
 
 (defn- run!
-  [project & args]
+  [project args]
   (let [result (apply clj-depend.main/run! (project->args project args))]
     (when-let [message (:message result)]
       (println message))

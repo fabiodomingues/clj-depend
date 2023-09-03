@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* [#38](https://github.com/fabiodomingues/clj-depend/issues/38): Fix execution failure when receiving arguments from Leiningen.
+
 ## 0.7.0 (2023-09-03)
 
 * [#1](https://github.com/fabiodomingues/clj-depend/issues/1): Dump the violations into a snapshot file (`.clj-depend/violations.edn`), and ignore any violations that are present in the snapshot file in future analysis.
