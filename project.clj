@@ -5,7 +5,7 @@
             :url  "https://www.eclipse.org/legal/epl-2.0/"}
   :profiles {:dev {:dependencies   [[org.clojure/test.check "1.1.1"]]
                    :resource-paths ["test-resources"]}}
-  :dependencies [[org.clojure/clojure "1.10.3" :scope "provided"]
+  :dependencies [[org.clojure/clojure "1.11.1" :scope "provided"]
                  [org.clojure/tools.namespace "1.2.0"]
                  [org.clojure/tools.cli "1.0.206"]]
   :scm {:name "git" :url "https://github.com/fabiodomingues/clj-depend"}
