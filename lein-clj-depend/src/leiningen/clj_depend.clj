@@ -1,7 +1,6 @@
 (ns leiningen.clj-depend
   (:refer-clojure :exclude [run!])
-  (:require [clojure.string :as string]
-            [clj-depend.main :as clj-depend.main]
+  (:require [clj-depend.main :as clj-depend.main]
             [leiningen.core.main :as leiningen.core]))
 
 (defn- project->args

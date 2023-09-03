@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 (2023-09-03)
+
 * [#1](https://github.com/fabiodomingues/clj-depend/issues/1): Dump the violations into a snapshot file (`.clj-depend/violations.edn`), and ignore any violations that are present in the snapshot file in future analysis.
 * [#33](https://github.com/fabiodomingues/clj-depend/issues/33): Merge default configuration, project configuration and configurations passed as parameter.
 * [#28](https://github.com/fabiodomingues/clj-depend/issues/28): Fix violation message from `should not depends on` to `should not depend on`.
