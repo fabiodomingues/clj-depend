@@ -2,10 +2,10 @@
 
 ## Unreleased
 
+## 0.8.0 (2023-09-03)
 * [#38](https://github.com/fabiodomingues/clj-depend/issues/38): Fix execution failure when receiving arguments from Leiningen.
 
 ## 0.7.0 (2023-09-03)
-
 * [#1](https://github.com/fabiodomingues/clj-depend/issues/1): Dump the violations into a snapshot file (`.clj-depend/violations.edn`), and ignore any violations that are present in the snapshot file in future analysis.
 * [#33](https://github.com/fabiodomingues/clj-depend/issues/33): Merge default configuration, project configuration and configurations passed as parameter.
 * [#28](https://github.com/fabiodomingues/clj-depend/issues/28): Fix violation message from `should not depends on` to `should not depend on`.
@@ -14,7 +14,6 @@
 * [#27](https://github.com/fabiodomingues/clj-depend/issues/27): Print violated layers.
 
 ## 0.6.0 (2022-06-01)
-
 * Fix violation when namespace depend on another on the same layer.
 * Declaring namespaces directly in layer configuration without regex.
 
