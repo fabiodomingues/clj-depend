@@ -149,8 +149,8 @@
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :snapshot?    true})))
 
-    (is (= [{:namespace 'sample.logic.foo, :dependency-namespace 'sample.controller.foo, :layer :logic, :dependency-layer :controller, :message "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]
-           (with-open [reader (PushbackReader. (io/reader (io/file (io/resource "with-violations/.clj-depend/violations.edn"))))]
+    (is (= {:violations [{:namespace 'sample.logic.foo, :dependency-namespace 'sample.controller.foo, :layer :logic, :dependency-layer :controller}]}
+           (with-open [reader (PushbackReader. (io/reader (io/file (io/resource "with-violations/.clj-depend/snapshot.edn"))))]
              (edn/read reader)))))
 
   (testing "should analyze the project and ignore any violations that are present in the snapshot file"
@@ -158,10 +158,10 @@
             :message     "No violations found!"}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))}))))
 
-  (io/delete-file (io/file (io/resource "with-violations/.clj-depend/violations.edn"))))
+  (io/delete-file (io/file (io/resource "with-violations/.clj-depend/snapshot.edn"))))
 
 (deftest analyze-project-without-violations-when-violations-snapshot-file-has-violations-no-longer-needed
   (testing "should analyze the project and fail due to violations in the snapshot file having violations that are no longer needed"
     (is (= {:result-code 2
-            :message "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes. For more information check the documentation at http://xxx.com."}
+            :message "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes."}
            (api/analyze {:project-root (io/file (io/resource "without-violations-and-snapshot-violations-no-longer-needed"))})))))

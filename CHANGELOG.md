@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.8.1 (2023-09-04)
+* Fix snapshot file name.
+* Fix documentation (cljdoc).
+
 ## 0.8.0 (2023-09-03)
 * [#38](https://github.com/fabiodomingues/clj-depend/issues/38): Fix execution failure when receiving arguments from Leiningen.
 

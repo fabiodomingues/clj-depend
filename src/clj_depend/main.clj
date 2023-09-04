@@ -20,7 +20,7 @@
     :validate [#(not (string/includes? (str %) " ")) "Namespaces should be separated by comma."]
     :assoc-fn #(assoc %1 %2 (->> (string/split %3 #",")
                                  (map symbol)))]
-   [nil "--snapshot" "Analyze namespace dependencies and dump the violations into a snapshot file (`.clj-depend/violations.edn`) that is used as a reference for further analysis."
+   [nil "--snapshot" "Analyze namespace dependencies and dump the violations into a snapshot file (`.clj-depend/snapshot.edn`) that is used as a reference for further analysis."
     :id :snapshot?
     :default false]])
 

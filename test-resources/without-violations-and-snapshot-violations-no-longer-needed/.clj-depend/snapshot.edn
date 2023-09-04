@@ -1,0 +1,1 @@
+{:violations [{:namespace sample.logic.foo, :dependency-namespace sample.controller.foo, :layer :logic, :dependency-layer :controller}]}

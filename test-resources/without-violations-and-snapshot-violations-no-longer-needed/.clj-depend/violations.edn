@@ -1,1 +1,0 @@
-({:namespace sample.logic.foo, :dependency-namespace sample.controller.foo, :layer :logic, :dependency-layer :controller, :message "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"})

@@ -1,27 +1,35 @@
 (ns clj-depend.snapshot
   (:require [clojure.edn :as edn]
-            [clojure.java.io :as io])
-  (:import (java.io PushbackReader)))
+            [clojure.java.io :as io]))
+
+(defn ^:private ->snapshot-violation
+  [violation]
+  (select-keys violation [:namespace :dependency-namespace :layer :dependency-layer]))
+
+(defn ^:private has-violation?
+  [violations violation]
+  (boolean (some #(= (->snapshot-violation violation) (->snapshot-violation %)) violations)))
+
+(defn ^:private check-snapshot-violations-no-longer-needed
+  [snapshot-violations violations]
+  (when-let [snapshot-violations-no-longer-needed (not-empty (remove #(has-violation? violations %) snapshot-violations))]
+    (throw (ex-info "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes."
+                    {:reason                      ::snapshot-violations-no-longer-needed
+                     :violations-no-longer-needed snapshot-violations-no-longer-needed}))))
 
 (defn without-violations-present-in-snapshot-file!
   [violations
    {:keys [project-root]}]
-  (let [snapshot-violations-file (io/file project-root ".clj-depend" "violations.edn")]
-    (if (.exists snapshot-violations-file)
-      (with-open [reader (PushbackReader. (io/reader snapshot-violations-file))]
-        (let [snapshot-violations (edn/read reader)
-              snapshot-violations-no-longer-needed (remove (fn [snapshot-violation] (some #(= snapshot-violation %) violations)) snapshot-violations)]
-          (when (not-empty snapshot-violations-no-longer-needed)
-            (throw (ex-info "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes. For more information check the documentation at http://xxx.com."
-                            {:reason ::snapshot-violations-no-longer-needed
-                             :violations-no-longer-needed snapshot-violations-no-longer-needed})))
-          (remove (fn [violation] (some #(= violation %) snapshot-violations)) violations)))
+  (let [snapshot-file (io/file project-root ".clj-depend" "snapshot.edn")]
+    (if (.exists snapshot-file)
+      (let [snapshot-violations (-> snapshot-file slurp edn/read-string :violations)]
+        (check-snapshot-violations-no-longer-needed snapshot-violations violations)
+        (remove #(has-violation? snapshot-violations %) violations))
       violations)))
 
 (defn dump-when-enabled!
   [violations
    {:keys [project-root snapshot?]}]
   (when snapshot?
-    (let [snapshot-violations-file (io/file project-root ".clj-depend" "violations.edn")]
-      (with-open [w (clojure.java.io/writer snapshot-violations-file)]
-        (.write w (pr-str violations))))))
+    (let [snapshot-file (io/file project-root ".clj-depend" "snapshot.edn")]
+      (spit snapshot-file {:violations (vec (map ->snapshot-violation violations))}))))
