@@ -174,3 +174,10 @@
     (is (= {:result-code 2
             :message "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes."}
            (api/analyze {:project-root (io/file (io/resource "without-violations-and-snapshot-violations-no-longer-needed"))})))))
+
+(deftest check-if-the-project-is-configured
+  (testing "should return true when the project is configured"
+    (is (true? (api/configured? (io/file (io/resource "without-violations"))))))
+
+  (testing "should return false when the project is not configured"
+    (is (false? (api/configured? (io/file (io/resource "not-configured")))))))

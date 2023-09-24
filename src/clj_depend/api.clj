@@ -2,6 +2,18 @@
   (:require [clj-depend.internal-api :as internal-api])
   (:import [java.io File]))
 
+(defn configured?
+  "Given the project root directory, check if it has the configuration file (`.clj-depend/config.edn`).
+
+  ```clojure
+  (when (clj-depend.api/configured? (io/file \".\"))
+    (do-something))
+  ```"
+  [project-root]
+  {:pre [(and (instance? File project-root)
+              (.exists ^File project-root))]}
+  (internal-api/configured? project-root))
+
 (defn analyze
   "Analyze namespaces dependencies.
 
