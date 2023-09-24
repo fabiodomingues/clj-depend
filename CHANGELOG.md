@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* [#39](https://github.com/fabiodomingues/clj-depend/issues/39): Fix circular dependency not being treated as a violation.
+
 ## 0.8.1 (2023-09-04)
 * Fix snapshot file name.
 * Fix documentation (cljdoc).

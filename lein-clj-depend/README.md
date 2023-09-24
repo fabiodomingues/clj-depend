@@ -18,8 +18,6 @@ Add the plugin to your `project.clj`:
 $ lein clj-depend
 ```
 
-In case any cyclic dependency is found the analysis will fail with the error message: `Circular dependency between "foo" and "bar"`.
-
 ## Exit codes
 
 - 0: no violations were found

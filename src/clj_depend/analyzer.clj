@@ -1,5 +1,4 @@
-(ns clj-depend.analyzer
-  (:require [clj-depend.dependency :as dependency]))
+(ns clj-depend.analyzer)
 
 (defn- layer-cannot-access-dependency-layer?
   [config layer dependency-layer]
@@ -22,7 +21,7 @@
   [config namespace layer]
   (let [namespaces (get-in config [:layers layer :namespaces])
         defined-by (get-in config [:layers layer :defined-by])]
-    (or (some #{namespace}  namespaces)
+    (or (some #{namespace} namespaces)
         (when defined-by (re-find (re-pattern defined-by) (str namespace))))))
 
 (defn- layer-by-namespace
@@ -36,22 +35,29 @@
      :dependency-namespace dependency-namespace
      :dependency-layer     (layer-by-namespace config dependency-namespace)}))
 
+(defn- layer-violations
+  [config namespace dependencies]
+  (->> dependencies
+       (map #(layer-and-namespace config namespace %))
+       (filter #(violate? config %))
+       (map (fn [{:keys [namespace dependency-namespace layer dependency-layer] :as violation}]
+              (assoc violation :message (str \" namespace \" " should not depend on " \" dependency-namespace \" " (layer " \" layer \" " on " \" dependency-layer \" ")"))))))
+
+(defn ^:private circular-dependency-violations
+  [namespace dependencies dependencies-by-namespace]
+  (->> dependencies-by-namespace
+       (filter (fn [[k _]] (contains? dependencies k)))
+       (filter (fn [[_ v]] (contains? v namespace)))
+       (map (fn [[k _]] {:namespace namespace :message (str "Circular dependency between " \" namespace \" " and " \" k \")}))))
+
 (defn- violations
-  [config dependency-graph namespace]
-  (let [dependencies (dependency/immediate-dependencies dependency-graph namespace)]
-    (->> dependencies
-         (map #(layer-and-namespace config namespace %))
-         (filter #(violate? config %))
-         not-empty)))
+  [config dependencies-by-namespace namespace]
+  (let [dependencies (get dependencies-by-namespace namespace)
+        circular-dependency-violations (circular-dependency-violations namespace dependencies dependencies-by-namespace)
+        layer-violations (layer-violations config namespace dependencies)]
+    (not-empty (concat circular-dependency-violations layer-violations))))
 
 (defn analyze
   "Analyze namespaces dependencies."
-  [{:keys [config namespaces dependency-graph]}]
-  (let [violations (flatten (keep #(violations config dependency-graph %) namespaces))]
-    (map (fn [{:keys [namespace dependency-namespace layer dependency-layer]}]
-           {:namespace namespace
-            :dependency-namespace dependency-namespace
-            :layer layer
-            :dependency-layer dependency-layer
-            :message (str \" namespace \" " should not depend on " \" dependency-namespace \" " (layer " \" layer \" " on " \" dependency-layer \" ")")})
-         violations)))
+  [{:keys [config dependencies-by-namespace]}]
+  (flatten (keep #(violations config dependencies-by-namespace %) (keys dependencies-by-namespace))))

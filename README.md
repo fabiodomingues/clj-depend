@@ -58,3 +58,13 @@ Configuration file (`.clj-depend/config.edn`) for diagram above:
           :model      {:defined-by         ".*\\.model\\..*"
                        :accesses-layers #{}}}}
 ```
+
+### Circular Dependency Checks
+
+Diagram to exemplify the circular dependency between namespaces:
+
+```mermaid
+graph TD
+    A[foo.controllers.user] --> B[foo.controllers.customer]
+    B --> A
+```
