@@ -1,7 +1,6 @@
 (ns clj-depend.internal-api
   (:require [clj-depend.analyzer :as analyzer]
             [clj-depend.config :as config]
-            [clj-depend.dependency :as dependency]
             [clj-depend.parser :as parser]
             [clj-depend.snapshot :as snapshot]
             [clojure.java.io :as io]
@@ -27,11 +26,10 @@
 (defn- ->namespaces
   [{:keys [namespaces]}
    {:keys [files] :as context}]
-  (assoc context :namespaces namespaces)
-  (let [ns-deps (parser/parse-clojure-files! files namespaces)
-        dependency-graph (dependency/dependencies-graph ns-deps)]
-    (assoc context :namespaces (if (empty? namespaces) (map :name ns-deps) namespaces)
-                   :dependency-graph dependency-graph)))
+  (let [ns-deps (parser/parse-clojure-files! files namespaces)]
+    (assoc context :dependencies-by-namespace (reduce-kv (fn [m k v] (assoc m k (:dependencies (first v))))
+                                                         {}
+                                                         (group-by :name ns-deps)))))
 
 (defn- build-context
   [options]

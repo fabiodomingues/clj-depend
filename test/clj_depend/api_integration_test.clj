@@ -16,8 +16,17 @@
 
 (deftest analyze-project-with-cyclic-dependency
   (testing "should fail when a cyclic dependency is identified"
-    (is (= {:result-code 2
-            :message     "Circular dependency between sample.logic.foo and sample.controller.foo"}
+    (is (= {:result-code 1
+            :message     "Circular dependency between \"sample.controller.foo\" and \"sample.logic.foo\"\nCircular dependency between \"sample.logic.foo\" and \"sample.controller.foo\"\n\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace 'sample.controller.foo
+                           :message   "Circular dependency between \"sample.controller.foo\" and \"sample.logic.foo\""}
+                          {:namespace 'sample.logic.foo
+                           :message   "Circular dependency between \"sample.logic.foo\" and \"sample.controller.foo\""}
+                          {:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
            (api/analyze {:project-root (io/file (io/resource "with-cyclic-dependency"))})))))
 
 (deftest analyze-project-without-violations
