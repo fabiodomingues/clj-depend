@@ -39,6 +39,10 @@
        (->files options)
        (->namespaces options)))
 
+(defn configured?
+  [project-root]
+  (config/configured? project-root))
+
 (defn analyze
   [options]
   (try

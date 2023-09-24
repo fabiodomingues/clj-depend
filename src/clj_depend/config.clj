@@ -20,3 +20,9 @@
     (merge default-config
            project-config
            config)))
+
+(defn configured?
+  [project-dir]
+  (-> project-dir
+      (io/file ".clj-depend" "config.edn")
+      .exists))
