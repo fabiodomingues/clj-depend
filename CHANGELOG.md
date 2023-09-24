@@ -1,7 +1,6 @@
 # CHANGELOG
 
 ## Unreleased
-
 * [#41](https://github.com/fabiodomingues/clj-depend/issues/41): API to check if clj-depend is configured.
 * [#39](https://github.com/fabiodomingues/clj-depend/issues/39): Fix circular dependency not being treated as a violation.
 
