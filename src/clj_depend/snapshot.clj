@@ -32,4 +32,5 @@
    {:keys [project-root snapshot?]}]
   (when snapshot?
     (let [snapshot-file (io/file project-root ".clj-depend" "snapshot.edn")]
+      (io/make-parents snapshot-file)
       (spit snapshot-file {:violations (vec (map ->snapshot-violation violations))}))))

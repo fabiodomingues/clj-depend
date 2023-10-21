@@ -175,6 +175,45 @@
             :message "The code has been improved, and one or more violations present in the clj-depend violations snapshot file are no longer needed. Please run clj-depend with the `--snapshot` option to update the snapshot file and commit the changes."}
            (api/analyze {:project-root (io/file (io/resource "without-violations-and-snapshot-violations-no-longer-needed"))})))))
 
+(deftest analyze-project-with-violation-without-config
+  (testing "should fail when there is at least one violation"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-without-config"))
+                         :config       {:source-paths #{"src"}
+                                        :layers       {:server     {:namespaces         #{'sample.server}
+                                                                    :accessed-by-layers #{}}
+                                                       :controller {:defined-by         ".*\\.controller\\..*"
+                                                                    :accessed-by-layers #{:server}}
+                                                       :logic      {:defined-by         ".*\\.logic\\..*"
+                                                                    :accessed-by-layers #{:controller}}}}})))))
+
+(deftest analyze-project-with-violation-without-config-when-snapshot-is-enabled
+  (testing "should fail when there is at least one violation"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-without-config"))
+                         :config       {:source-paths #{"src"}
+                                        :layers       {:server     {:namespaces         #{'sample.server}
+                                                                    :accessed-by-layers #{}}
+                                                       :controller {:defined-by         ".*\\.controller\\..*"
+                                                                    :accessed-by-layers #{:server}}
+                                                       :logic      {:defined-by         ".*\\.logic\\..*"
+                                                                    :accessed-by-layers #{:controller}}}}
+                         :snapshot?    true})))
+
+    (is (= {:violations [{:namespace 'sample.logic.foo, :dependency-namespace 'sample.controller.foo, :layer :logic, :dependency-layer :controller}]}
+           (with-open [reader (PushbackReader. (io/reader (io/file (io/resource "with-violations-without-config/.clj-depend/snapshot.edn"))))]
+             (edn/read reader))))
+
+    (io/delete-file (io/file (io/resource "with-violations-without-config/.clj-depend/snapshot.edn")))
+    (io/delete-file (io/file (io/resource "with-violations-without-config/.clj-depend")))))
+
 (deftest check-if-the-project-is-configured
   (testing "should return true when the project is configured"
     (is (true? (api/configured? (io/file (io/resource "without-violations"))))))
