@@ -14,6 +14,8 @@
   [config
    {:keys [layer dependency-layer]}]
   (and (not= layer dependency-layer)
+       (and (not (nil? layer))
+            (not (nil? dependency-layer)))
        (or (dependency-layer-cannot-be-accessed-by-layer? config dependency-layer layer)
            (layer-cannot-access-dependency-layer? config layer dependency-layer))))
 
