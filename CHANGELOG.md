@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## Unreleased
+* [#46](https://github.com/fabiodomingues/clj-depend/issues/46): Fix false violation when using `:access-layers` due to dependency on namespaces not defined in layers.
 
 ## 0.9.1 (2023-10-24)
 * [#44](https://github.com/fabiodomingues/clj-depend/issues/44): Fix not creating snapshot file when clj-depend folder does not exist.
