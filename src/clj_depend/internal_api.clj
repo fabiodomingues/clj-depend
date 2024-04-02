@@ -15,13 +15,22 @@
    {:keys [project-root] :as context}]
   (assoc context :config (config/resolve-config! project-root config)))
 
+(defn ^:private file-within-some-source-paths?
+  [file source-paths]
+  (some #(.startsWith (.toPath file) (.toPath %)) source-paths))
+
+(defn ^:private files-within-source-paths
+  [files source-paths]
+  (filter #(file-within-some-source-paths? % source-paths) files))
+
 (defn- ->files
   [{:keys [files]}
    {:keys [project-root] {:keys [source-paths]} :config :as context}]
-  (cond
-    (not-empty files) (assoc context :files files)
-    (not-empty source-paths) (assoc context :files (map #(io/file project-root %) source-paths))
-    :else (assoc context :files #{project-root})))
+  (let [source-paths (map #(io/file project-root %) source-paths)]
+    (cond
+      (not-empty files) (assoc context :files (files-within-source-paths files source-paths))
+      (not-empty source-paths) (assoc context :files source-paths)
+      :else (assoc context :files #{project-root}))))
 
 (defn- ->namespaces
   [{:keys [namespaces]}
