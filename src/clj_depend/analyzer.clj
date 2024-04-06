@@ -1,5 +1,34 @@
 (ns clj-depend.analyzer)
 
+(defn ^:private should-not-depend-on-dependency?
+  [should-not-depend-on dependency]
+  (cond
+    (string? should-not-depend-on)
+    (re-find (re-pattern should-not-depend-on) (str dependency))
+
+    (symbol? should-not-depend-on)
+    (= should-not-depend-on dependency)))
+
+
+(defn ^:private rule-applies-to-namespace?
+  [{:keys [namespaces defined-by]}
+   namespace]
+  (or (some #{namespace} namespaces)
+      (when defined-by (re-find (re-pattern defined-by) (str namespace)))))
+
+(defn ^:private rule-violations
+  [{:keys [rules]}
+   namespace
+   dependencies]
+  (let [namespace-related-rules (filter #(rule-applies-to-namespace? % namespace) rules)]
+    (keep (fn [{:keys [should-not-depend-on] :as rule}]
+            (keep (fn [should-not-depend-on]
+                    (keep (fn [dependency-namespace]
+                            (when (should-not-depend-on-dependency? should-not-depend-on dependency-namespace)
+                              {:namespace            namespace
+                               :dependency-namespace dependency-namespace
+                               :message              (str \" namespace \" " should not depend on " \" dependency-namespace \")})) dependencies)) should-not-depend-on)) namespace-related-rules)))
+
 (defn- layer-cannot-access-dependency-layer?
   [config layer dependency-layer]
   (when-let [accesses-layers (get-in config [:layers layer :accesses-layers])]
@@ -56,8 +85,9 @@
   [config dependencies-by-namespace namespace]
   (let [dependencies (get dependencies-by-namespace namespace)
         circular-dependency-violations (circular-dependency-violations namespace dependencies dependencies-by-namespace)
-        layer-violations (layer-violations config namespace dependencies)]
-    (not-empty (concat circular-dependency-violations layer-violations))))
+        layer-violations (layer-violations config namespace dependencies)
+        rule-violations (rule-violations config namespace dependencies)]
+    (not-empty (concat circular-dependency-violations layer-violations rule-violations))))
 
 (defn analyze
   "Analyze namespaces dependencies."

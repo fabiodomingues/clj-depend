@@ -1,8 +1,10 @@
 (ns clj-depend.analyzer-test
   (:require [clojure.test :refer :all]
-            [clj-depend.analyzer :as analyzer]))
+            [clj-depend.analyzer :as analyzer]
+            [matcher-combinators.test :refer [match?]]
+            [matcher-combinators.matchers :as m]))
 
-(def ns-deps-a {'foo.a.bar #{'foo.b.bar 'foo.c.bar}})
+(def ns-deps-a {'foo.a.bar #{'foo.b.bar 'foo.c.bar 'foo.b.baz}})
 
 (def ns-deps-b {'foo.b.bar #{'foo.b.baz}
                 'foo.b.baz #{}})
@@ -91,3 +93,22 @@
     (is (= []
            (analyzer/analyze {:config                    (update-in config-using-access-layers [:layers] dissoc :b)
                               :dependencies-by-namespace ns-deps-with-violations})))))
+
+(deftest analyze-rules
+  (testing "should return violations when a rule is satisfied"
+    (are [config]
+      (is (match? (m/in-any-order [{:namespace            'foo.a.bar
+                                    :dependency-namespace 'foo.b.bar
+                                    :message              "\"foo.a.bar\" should not depend on \"foo.b.bar\""}
+                                   {:namespace            'foo.a.bar
+                                    :dependency-namespace 'foo.b.baz
+                                    :message              "\"foo.a.bar\" should not depend on \"foo.b.baz\""}])
+                  (analyzer/analyze {:config                    config
+                                     :dependencies-by-namespace ns-deps})))
+
+      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\..*"}}]}
+      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
+      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\.bar" 'foo.b.baz}}]}
+      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{".*\\.b\\..*"}}]}
+      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
+      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]})))
