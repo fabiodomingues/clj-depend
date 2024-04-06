@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* [#48](https://github.com/fabiodomingues/clj-depend/issues/48): Fix analyzing files outside of configured source-paths.
+
 ## 0.9.2 (2023-10-24)
 * [#46](https://github.com/fabiodomingues/clj-depend/issues/46): Fix false violation when using `:access-layers` due to dependency on namespaces not defined in layers.
 

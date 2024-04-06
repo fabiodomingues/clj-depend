@@ -16,7 +16,7 @@
     :assoc-fn #(assoc %1 %2 (->> (string/split %3 #",")
                                  (map io/file)))]
    [nil "--namespaces NAMESPACES" "Namespaces to be analyzed. If empty, all project namespaces will be considered."
-    :id :source-paths
+    :id :namespaces
     :validate [#(not (string/includes? (str %) " ")) "Namespaces should be separated by comma."]
     :assoc-fn #(assoc %1 %2 (->> (string/split %3 #",")
                                  (map symbol)))]

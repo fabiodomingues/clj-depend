@@ -151,6 +151,42 @@
                            :message              "\"module1.controller.foo\" should not depend on \"module2.logic.foo\" (layer \":module1-controller\" on \":module2-logic\")"}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-for-modular-structure"))})))))
 
+(deftest analyze-project-with-violation-between-different-source-paths
+  (testing "should succeed when the source-paths do not include the one containing violations"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
+                         :config       {:source-paths #{"src"}}}))))
+
+  (testing "should fail when the source-paths include the one containing violations"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo-test
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
+                         :config       {:source-paths #{"src" "test"}}}))))
+
+  (testing "should fail when there is no source-paths configured because the entire project is analyzed"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo-test
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
+                         :config       {:source-paths #{}}}))))
+
+  (testing "should succeed when the source paths do not include the one containing violations even when receiving files that have violations but are not in the source-paths"
+    (is (= {:result-code 0
+            :message     "No violations found!"}
+           (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
+                         :files        #{(io/file (io/resource "with-violations-between-different-source-paths/test/sample/logic/foo_test.clj"))}
+                         :config       {:source-paths #{"src"}}})))))
+
 (deftest analyze-project-with-violations-when-snapshot-enabled
   (testing "should analyze the project and dump violations when snapshot is enabled"
     (is (= {:result-code 0

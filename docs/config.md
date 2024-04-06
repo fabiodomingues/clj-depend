@@ -17,7 +17,7 @@ You can find all settings and its default values [here](../src/clj_depend/config
 
 ### :source-paths
 
-Directories within the project to look for clj files.
+Directories within the project to look for clj files. Files outside the source-paths will be ignored.
 
 Default: `#{"src"}`.
 
