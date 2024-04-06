@@ -111,4 +111,8 @@
       {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\.bar" 'foo.b.baz}}]}
       {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{".*\\.b\\..*"}}]}
       {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
-      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]})))
+      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]}))
+
+  (testing "should return zero violations when a rule is not satisfied"
+    (is (empty? (analyzer/analyze {:config                    {:rules [{:defined-by ".*\\.c\\..*" :should-not-depend-on #{".*\\.a\\..*"}}]}
+                                   :dependencies-by-namespace ns-deps})))))
