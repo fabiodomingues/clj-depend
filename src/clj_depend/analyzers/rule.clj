@@ -34,7 +34,8 @@
   [{:keys [namespaces defined-by]}
    namespace]
   (or (some #{namespace} namespaces)
-      (when defined-by (re-find (re-pattern defined-by) (str namespace)))))
+      (when defined-by (re-find (re-pattern defined-by) (str namespace)))
+      (and (empty? namespaces) (empty? defined-by))))
 
 (defn analyze
   [{:keys [rules]}

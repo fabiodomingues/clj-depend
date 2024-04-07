@@ -22,7 +22,8 @@
       {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\.bar" 'foo.b.baz}}]}
       {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{".*\\.b\\..*"}}]}
       {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
-      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]}))
+      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]}
+      {:rules [{:should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}))
 
   (testing "should not return violations when no rules are satisfied"
     (is (empty? (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.d\\..*"}}]}

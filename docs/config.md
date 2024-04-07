@@ -21,6 +21,13 @@ Directories within the project to look for clj files. Files outside the source-p
 
 Default: `#{"src"}`.
 
+Config example:
+```clojure
+{,,,
+ :source-paths #{"src" "test"}
+ ,,,}
+```
+
 ### :layers
 
 Defining the layers of your project.
@@ -31,12 +38,38 @@ A map where each key is a layer and the value is a map, where:
 - The layer is defined by a regex using the `:defined-by` key or a set of namespaces using the `:namespaces` key.
 - The accesses allowed by it declared using the `:accesses-layers` key, or the accesses that are allowed to the layer using the `:accessed-by-layers` key. Since both keys accept a set of layers.
 
-Layer configuration example:
+Config example:
 ```clojure
-{:controller {:defined-by         ".*\\.controller\\..*"
-              :accesses-layers #{:logic :model}}
- :logic      {:defined-by         ".*\\.logic\\..*"
-              :accesses-layers #{:model}}
- :model      {:defined-by         ".*\\.model\\..*"
-              :accesses-layers #{}}}
+{,,,
+ :layers {:controller {:defined-by      ".*\\.controller\\..*"
+                       :accesses-layers #{:logic :model}}
+          :logic      {:defined-by      ".*\\.logic\\..*"
+                       :accesses-layers #{:model}}
+          :model      {:defined-by      ".*\\.model\\..*"
+                       :accesses-layers #{}}}
+ ,,,}
 ```
+
+### :rules
+
+Defining the rules for namespaces.
+
+Default: `[]`.
+
+A vector of rules whose each rule is a map composed of the following fields:
+- `:defined-by` a regular expression (regex) that serves as a predicate to identify whether the rule should be evaluated.
+- `:namespaces` a set of namespaces that serves as a predicate to identify whether the rule should be evaluated.
+- `:should-not-depend-on` a set of namespaces or regular expressions (regex).
+
+You can use the keys that serve as predicates (`:defined-by` and `:namespaces`) individually, combine both, or use neither. **If none of them are provided, the rule will apply to all namespaces present in the configured source-paths.**
+
+Config example:
+```clojure
+{,,,
+ :rules [{:defined-by           ".*\\.logic\\..*"
+          :should-not-depend-on #{".*\\.controller\\..*"}}
+         {:namespaces           #{foo.x}
+          :should-not-depend-on #{bar.x}}]
+ ,,,}
+```
+
