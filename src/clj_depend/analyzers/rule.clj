@@ -2,10 +2,12 @@
 
 (defn ^:private violation
   [namespace
-   dependency]
+   dependency
+   message]
   {:namespace            namespace
    :dependency-namespace dependency
-   :message              (str \" namespace \" " should not depend on " \" dependency \")})
+   :message              (or message
+                             (str \" namespace \" " should not depend on " \" dependency \"))})
 
 (defn ^:private should-not-depend-on-dependency?
   [should-not-depend-on
@@ -23,12 +25,12 @@
   (some #(should-not-depend-on-dependency? % dependency) should-not-depend-on))
 
 (defn ^:private violations-by-rule
-  [rule
+  [{:keys [message] :as rule}
    namespace
    dependencies]
   (->> dependencies
        (filter #(dependency-violates-the-rule? % rule))
-       (map #(violation namespace %))))
+       (map #(violation namespace % message))))
 
 (defn ^:private rule-applies-to-namespace?
   [{:keys [namespaces defined-by]}
