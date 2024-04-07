@@ -1,93 +1,33 @@
 (ns clj-depend.analyzer-test
   (:require [clojure.test :refer :all]
-            [clj-depend.analyzer :as analyzer]))
-
-(def ns-deps-a {'foo.a.bar #{'foo.b.bar 'foo.c.bar}})
-
-(def ns-deps-b {'foo.b.bar #{'foo.b.baz}
-                'foo.b.baz #{}})
-
-(def ns-deps-c {'foo.c.bar #{}})
-
-(def ns-deps-c-with-violation {'foo.c.bar #{'foo.b.bar}})
-
-(def config-using-accessed-by-layers {:layers {:a {:defined-by         ".*\\.a\\..*"
-                                                   :accessed-by-layers #{}}
-                                               :b {:defined-by         ".*\\.b\\..*"
-                                                   :accessed-by-layers #{:a}}
-                                               :c {:defined-by         ".*\\.c\\..*"
-                                                   :accessed-by-layers #{:a :b}}}})
-
-(def config-using-accessed-by-layers-with-namespaces {:layers {:a {:namespaces         #{'foo.a.bar}
-                                                                   :accessed-by-layers #{}}
-                                                               :b {:namespaces         #{'foo.b.bar 'foo.b.baz}
-                                                                   :accessed-by-layers #{:a}}
-                                                               :c {:defined-by         ".*\\.c\\..*"
-                                                                   :accessed-by-layers #{:a :b}}}})
-
-(def config-using-access-layers {:layers {:a {:defined-by      ".*\\.a\\..*"
-                                              :accesses-layers #{:b :c}}
-                                          :b {:defined-by      ".*\\.b\\..*"
-                                              :accesses-layers #{:c}}
-                                          :c {:defined-by      ".*\\.c\\..*"
-                                              :accesses-layers #{}}}})
-
-(def ns-deps (merge ns-deps-a ns-deps-b ns-deps-c))
-
-(def ns-deps-with-violations (merge ns-deps-a ns-deps-b ns-deps-c-with-violation))
+            [clj-depend.analyzer :as analyzer]
+            [matcher-combinators.test :refer [match?]]
+            [matcher-combinators.matchers :as m]))
 
 (deftest analyze-test
-  (testing "should return zero violations when there is no layers declared"
-    (is (= []
-           (analyzer/analyze {:config                    {:layers {}}
-                              :dependencies-by-namespace ns-deps})))))
+  (testing "should not return violations when there are no circular dependencies and no layers violated"
+    (is (empty? (analyzer/analyze {:config                    {:layers {}}
+                                   :dependencies-by-namespace {'foo.a.bar  #{}
+                                                               'foo.b.bar  #{'foo.a.bar}
+                                                               'foo.any    #{'foo.a.bar}}}))))
 
-(deftest analyze-test-using-accessed-by-layers
-  (testing "should return zero violations when there is no forbidden access"
-    (is (= []
-           (analyzer/analyze {:config                    config-using-accessed-by-layers
-                              :dependencies-by-namespace ns-deps}))))
-
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-accessed-by-layers
-                              :dependencies-by-namespace ns-deps-with-violations}))))
-
-  (testing "should return zero violations when a layer has namespaces that depend on another namespace that is not in any layer of the configuration"
-    (is (= []
-           (analyzer/analyze {:config                    (update-in config-using-accessed-by-layers [:layers] dissoc :b)
-                              :dependencies-by-namespace ns-deps})))))
-
-(deftest analyze-config-with-namespaces-test
-  (testing "should return zero violations when there is no forbidden access"
-    (is (= []
-           (analyzer/analyze {:config                    config-using-accessed-by-layers-with-namespaces
-                              :dependencies-by-namespace ns-deps}))))
-
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-accessed-by-layers-with-namespaces
-                              :dependencies-by-namespace ns-deps-with-violations})))))
-
-(deftest analyze-test-using-access-layers
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-access-layers
-                              :dependencies-by-namespace ns-deps-with-violations}))))
-
-  (testing "should return zero violations when a layer has namespaces that depend on another namespace that is not in any layer of the configuration"
-    (is (= []
-           (analyzer/analyze {:config                    (update-in config-using-access-layers [:layers] dissoc :b)
-                              :dependencies-by-namespace ns-deps-with-violations})))))
+  (testing "should return violations when there are circular dependencies or layers violated"
+    (is (match? (m/in-any-order [{:namespace            'foo.a.bar
+                                  :dependency-namespace 'foo.any
+                                  :message              "Circular dependency between \"foo.a.bar\" and \"foo.any\""}
+                                 {:namespace            'foo.any
+                                  :dependency-namespace 'foo.a.bar
+                                  :message              "Circular dependency between \"foo.any\" and \"foo.a.bar\""}
+                                 {:namespace            'foo.b.bar
+                                  :layer                :b
+                                  :dependency-namespace 'foo.a.bar
+                                  :dependency-layer     :a
+                                  :message              "\"foo.b.bar\" should not depend on \"foo.a.bar\" (layer \":b\" on \":a\")"}])
+                (analyzer/analyze {:config                    {:layers {:a {:defined-by      ".*\\.a\\..*"
+                                                                            :accesses-layers #{}}
+                                                                        :b {:defined-by      ".*\\.b\\..*"
+                                                                            :accesses-layers #{}}}}
+                                   :dependencies-by-namespace {'foo.a.bar  #{'foo.any}
+                                                               'foo.b.bar  #{'foo.a.bar}
+                                                               'foo.any    #{'foo.a.bar}
+                                                               'foo.a-test #{'lib.x.y.z}}})))))
