@@ -5,15 +5,13 @@
             [matcher-combinators.matchers :as m]))
 
 (deftest analyze-test
-  (testing "should not return violations when there are no circular dependencies and no layers/rules violated"
-    (is (empty? (analyzer/analyze {:config                    {:layers {}
-                                                               :rules  []}
+  (testing "should not return violations when there are no circular dependencies and no layers violated"
+    (is (empty? (analyzer/analyze {:config                    {:layers {}}
                                    :dependencies-by-namespace {'foo.a.bar  #{}
                                                                'foo.b.bar  #{'foo.a.bar}
-                                                               'foo.any    #{'foo.a.bar}
-                                                               'foo.a-test #{'lib.x.y.z}}}))))
+                                                               'foo.any    #{'foo.a.bar}}}))))
 
-  (testing "should return violations when there are circular dependencies or layers/rules violated"
+  (testing "should return violations when there are circular dependencies or layers violated"
     (is (match? (m/in-any-order [{:namespace            'foo.a.bar
                                   :dependency-namespace 'foo.any
                                   :message              "Circular dependency between \"foo.a.bar\" and \"foo.any\""}
@@ -24,15 +22,11 @@
                                   :layer                :b
                                   :dependency-namespace 'foo.a.bar
                                   :dependency-layer     :a
-                                  :message              "\"foo.b.bar\" should not depend on \"foo.a.bar\" (layer \":b\" on \":a\")"}
-                                 {:namespace            'foo.a-test
-                                  :dependency-namespace 'lib.x.y.z
-                                  :message              "\"foo.a-test\" should not depend on \"lib.x.y.z\""}])
+                                  :message              "\"foo.b.bar\" should not depend on \"foo.a.bar\" (layer \":b\" on \":a\")"}])
                 (analyzer/analyze {:config                    {:layers {:a {:defined-by      ".*\\.a\\..*"
                                                                             :accesses-layers #{}}
                                                                         :b {:defined-by      ".*\\.b\\..*"
-                                                                            :accesses-layers #{}}}
-                                                               :rules  [{:namespaces #{'foo.a-test} :should-not-depend-on #{'lib.x.y.z}}]}
+                                                                            :accesses-layers #{}}}}
                                    :dependencies-by-namespace {'foo.a.bar  #{'foo.any}
                                                                'foo.b.bar  #{'foo.a.bar}
                                                                'foo.any    #{'foo.a.bar}
