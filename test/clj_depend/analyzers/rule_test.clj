@@ -5,7 +5,7 @@
             [matcher-combinators.matchers :as m]))
 
 (deftest analyze-test
-  (testing "should return violations when at least one rule is satisfied"
+  (testing "should not return violations when there is a rule for the namespace and the constraints are satisfied"
     (are [config]
       (is (match? (m/in-any-order [{:namespace            'foo.a.bar
                                     :dependency-namespace 'foo.b.bar
@@ -25,7 +25,13 @@
       {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]}
       {:rules [{:should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}))
 
-  (testing "should not return violations when no rules are satisfied"
+  (testing "should not return violations when there is a rule for the namespace but the constraints are not satisfied"
     (is (empty? (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.d\\..*"}}]}
                                         'foo.a.bar
-                                        #{'foo.b.bar 'foo.c.bar 'foo.b.baz})))))
+                                        #{'foo.b.bar 'foo.c.bar 'foo.b.baz}))))
+
+  (testing "should not return violations when there is no rule for the namespaces"
+    (is (empty? (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.d\\..*"}}]}
+                                        'foo.a.bar
+                                        #{'foo.b.bar 'foo.c.bar 'foo.b.baz}))))
+  )
