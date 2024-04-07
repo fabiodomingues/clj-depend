@@ -36,9 +36,10 @@
   (or (some #{namespace} namespaces)
       (when defined-by (re-find (re-pattern defined-by) (str namespace)))))
 
-(defn violations
+(defn analyze
   [{:keys [rules]}
    namespace
    dependencies]
-  (let [namespace-related-rules (filter #(rule-applies-to-namespace? % namespace) rules)]
-    (keep #(violations-by-rule % namespace dependencies) namespace-related-rules)))
+  (->> (filter #(rule-applies-to-namespace? % namespace) rules)
+       (keep #(violations-by-rule % namespace dependencies))
+       flatten))
