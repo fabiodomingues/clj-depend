@@ -37,7 +37,7 @@
      :dependency-namespace dependency-namespace
      :dependency-layer     (layer-by-namespace config dependency-namespace)}))
 
-(defn violations
+(defn analyze
   [config namespace dependencies]
   (->> dependencies
        (map #(layer-and-namespace config namespace %))

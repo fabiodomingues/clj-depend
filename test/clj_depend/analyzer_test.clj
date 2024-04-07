@@ -4,115 +4,36 @@
             [matcher-combinators.test :refer [match?]]
             [matcher-combinators.matchers :as m]))
 
-(def ns-deps-a {'foo.a.bar #{'foo.b.bar 'foo.c.bar 'foo.b.baz}})
-
-(def ns-deps-b {'foo.b.bar #{'foo.b.baz}
-                'foo.b.baz #{}})
-
-(def ns-deps-c {'foo.c.bar #{}})
-
-(def ns-deps-c-with-violation {'foo.c.bar #{'foo.b.bar}})
-
-(def config-using-accessed-by-layers {:layers {:a {:defined-by         ".*\\.a\\..*"
-                                                   :accessed-by-layers #{}}
-                                               :b {:defined-by         ".*\\.b\\..*"
-                                                   :accessed-by-layers #{:a}}
-                                               :c {:defined-by         ".*\\.c\\..*"
-                                                   :accessed-by-layers #{:a :b}}}})
-
-(def config-using-accessed-by-layers-with-namespaces {:layers {:a {:namespaces         #{'foo.a.bar}
-                                                                   :accessed-by-layers #{}}
-                                                               :b {:namespaces         #{'foo.b.bar 'foo.b.baz}
-                                                                   :accessed-by-layers #{:a}}
-                                                               :c {:defined-by         ".*\\.c\\..*"
-                                                                   :accessed-by-layers #{:a :b}}}})
-
-(def config-using-access-layers {:layers {:a {:defined-by      ".*\\.a\\..*"
-                                              :accesses-layers #{:b :c}}
-                                          :b {:defined-by      ".*\\.b\\..*"
-                                              :accesses-layers #{:c}}
-                                          :c {:defined-by      ".*\\.c\\..*"
-                                              :accesses-layers #{}}}})
-
-(def ns-deps (merge ns-deps-a ns-deps-b ns-deps-c))
-
-(def ns-deps-with-violations (merge ns-deps-a ns-deps-b ns-deps-c-with-violation))
-
 (deftest analyze-test
-  (testing "should return zero violations when there is no layers declared"
-    (is (= []
-           (analyzer/analyze {:config                    {:layers {}}
-                              :dependencies-by-namespace ns-deps})))))
+  (testing "should not return violations when there are no circular dependencies and no layers/rules violated"
+    (is (empty? (analyzer/analyze {:config                    {:layers {}
+                                                               :rules  []}
+                                   :dependencies-by-namespace {'foo.a.bar  #{}
+                                                               'foo.b.bar  #{'foo.a.bar}
+                                                               'foo.any    #{'foo.a.bar}
+                                                               'foo.a-test #{'lib.x.y.z}}}))))
 
-(deftest analyze-test-using-accessed-by-layers
-  (testing "should return zero violations when there is no forbidden access"
-    (is (= []
-           (analyzer/analyze {:config                    config-using-accessed-by-layers
-                              :dependencies-by-namespace ns-deps}))))
-
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-accessed-by-layers
-                              :dependencies-by-namespace ns-deps-with-violations}))))
-
-  (testing "should return zero violations when a layer has namespaces that depend on another namespace that is not in any layer of the configuration"
-    (is (= []
-           (analyzer/analyze {:config                    (update-in config-using-accessed-by-layers [:layers] dissoc :b)
-                              :dependencies-by-namespace ns-deps})))))
-
-(deftest analyze-config-with-namespaces-test
-  (testing "should return zero violations when there is no forbidden access"
-    (is (= []
-           (analyzer/analyze {:config                    config-using-accessed-by-layers-with-namespaces
-                              :dependencies-by-namespace ns-deps}))))
-
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-accessed-by-layers-with-namespaces
-                              :dependencies-by-namespace ns-deps-with-violations})))))
-
-(deftest analyze-test-using-access-layers
-  (testing "should return violations when there is any forbidden access"
-    (is (= [{:namespace            'foo.c.bar
-             :dependency-namespace 'foo.b.bar
-             :layer                :c
-             :dependency-layer     :b
-             :message              "\"foo.c.bar\" should not depend on \"foo.b.bar\" (layer \":c\" on \":b\")"}]
-           (analyzer/analyze {:config                    config-using-access-layers
-                              :dependencies-by-namespace ns-deps-with-violations}))))
-
-  (testing "should return zero violations when a layer has namespaces that depend on another namespace that is not in any layer of the configuration"
-    (is (= []
-           (analyzer/analyze {:config                    (update-in config-using-access-layers [:layers] dissoc :b)
-                              :dependencies-by-namespace ns-deps-with-violations})))))
-
-(deftest analyze-rules
-  (testing "should return violations when a rule is satisfied"
-    (are [config]
-      (is (match? (m/in-any-order [{:namespace            'foo.a.bar
-                                    :dependency-namespace 'foo.b.bar
-                                    :message              "\"foo.a.bar\" should not depend on \"foo.b.bar\""}
-                                   {:namespace            'foo.a.bar
-                                    :dependency-namespace 'foo.b.baz
-                                    :message              "\"foo.a.bar\" should not depend on \"foo.b.baz\""}])
-                  (analyzer/analyze {:config                    config
-                                     :dependencies-by-namespace ns-deps})))
-
-      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\..*"}}]}
-      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
-      {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\.bar" 'foo.b.baz}}]}
-      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{".*\\.b\\..*"}}]}
-      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
-      {:rules [{:namespaces #{'foo.a.bar} :should-not-depend-on #{"foo\\.b\\.bar" 'foo.b.baz}}]}))
-
-  (testing "should return zero violations when a rule is not satisfied"
-    (is (empty? (analyzer/analyze {:config                    {:rules [{:defined-by ".*\\.c\\..*" :should-not-depend-on #{".*\\.a\\..*"}}]}
-                                   :dependencies-by-namespace ns-deps})))))
+  (testing "should return violations when there are circular dependencies or layers/rules violated"
+    (is (match? (m/in-any-order [{:namespace            'foo.a.bar
+                                  :dependency-namespace 'foo.any
+                                  :message              "Circular dependency between \"foo.a.bar\" and \"foo.any\""}
+                                 {:namespace            'foo.any
+                                  :dependency-namespace 'foo.a.bar
+                                  :message              "Circular dependency between \"foo.any\" and \"foo.a.bar\""}
+                                 {:namespace            'foo.b.bar
+                                  :layer                :b
+                                  :dependency-namespace 'foo.a.bar
+                                  :dependency-layer     :a
+                                  :message              "\"foo.b.bar\" should not depend on \"foo.a.bar\" (layer \":b\" on \":a\")"}
+                                 {:namespace            'foo.a-test
+                                  :dependency-namespace 'lib.x.y.z
+                                  :message              "\"foo.a-test\" should not depend on \"lib.x.y.z\""}])
+                (analyzer/analyze {:config                    {:layers {:a {:defined-by      ".*\\.a\\..*"
+                                                                            :accesses-layers #{}}
+                                                                        :b {:defined-by      ".*\\.b\\..*"
+                                                                            :accesses-layers #{}}}
+                                                               :rules  [{:namespaces #{'foo.a-test} :should-not-depend-on #{'lib.x.y.z}}]}
+                                   :dependencies-by-namespace {'foo.a.bar  #{'foo.any}
+                                                               'foo.b.bar  #{'foo.a.bar}
+                                                               'foo.any    #{'foo.a.bar}
+                                                               'foo.a-test #{'lib.x.y.z}}})))))
