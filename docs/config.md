@@ -57,9 +57,10 @@ Defining the rules for namespaces.
 Default: `[]`.
 
 A vector of rules whose each rule is a map composed of the following fields:
-- `:defined-by` a regular expression (regex) that serves as a predicate to identify whether the rule should be evaluated.
-- `:namespaces` a set of namespaces that serves as a predicate to identify whether the rule should be evaluated.
-- `:should-not-depend-on` a set of namespaces or regular expressions (regex).
+- `:defined-by` optional, a regular expression (regex) that serves as a predicate to identify whether the rule should be evaluated.
+- `:namespaces` optional, a set of namespaces that serves as a predicate to identify whether the rule should be evaluated.
+- `:should-not-depend-on` required, a set of namespaces or regular expressions (regex).
+- `:message` optional, a custom violation message.
 
 You can use the keys that serve as predicates (`:defined-by` and `:namespaces`) individually, combine both, or use neither. **If none of them are provided, the rule will apply to all namespaces present in the configured source-paths.**
 
@@ -68,8 +69,9 @@ Config example:
 {,,,
  :rules [{:defined-by           ".*\\.logic\\..*"
           :should-not-depend-on #{".*\\.controller\\..*"}}
-         {:namespaces           #{foo.x}
-          :should-not-depend-on #{bar.x}}]
+         {:namespaces           #{foo.a}
+          :should-not-depend-on #{foo.x}
+          :message              "Prefer using foo.y instead of foo.x"}]
  ,,,}
 ```
 
