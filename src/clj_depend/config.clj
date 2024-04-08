@@ -5,7 +5,8 @@
 
 (def ^:private default-config
   {:source-paths #{"src"}
-   :layers       {}})
+   :layers       {}
+   :rules        []})
 
 (defn ^:private read!
   [project-dir]
