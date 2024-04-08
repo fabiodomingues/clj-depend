@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 0.10.0 (2024-04-08)
 * [#51](https://github.com/fabiodomingues/clj-depend/issues/51): Namespace rule analyzer.
 * [#55](https://github.com/fabiodomingues/clj-depend/issues/55): Split analyzers into separate namespaces for better code organization and consequently simplify testing.
 * [#48](https://github.com/fabiodomingues/clj-depend/issues/48): Fix analyzing files outside of configured source-paths.

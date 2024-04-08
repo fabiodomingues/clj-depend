@@ -16,7 +16,7 @@ Add clj-depend as a dependency, preferably under an alias in `deps.edn`.
 
 ```clojure
 {:deps { ,,, }
- :aliases {:clj-depend {:extra-deps {com.fabiodomingues/clj-depend {:mvn/version "0.9.2"}}
+ :aliases {:clj-depend {:extra-deps {com.fabiodomingues/clj-depend {:mvn/version "0.10.0"}}
                         :main-opts ["-m" "clj-depend.main"]}}}
 ```
 
@@ -57,6 +57,17 @@ Configuration file (`.clj-depend/config.edn`) for diagram above:
                        :accesses-layers #{:model}}
           :model      {:defined-by         ".*\\.model\\..*"
                        :accesses-layers #{}}}}
+```
+
+### Rule Checks
+
+Example configuration file (`.clj-depend/config.edn`):
+
+```clojure
+{,,,
+ :rules [{:defined-by           ".*\\.logic\\..*"
+          :should-not-depend-on #{".*\\.controller\\..*"}}]
+ ,,,}
 ```
 
 ### Circular Dependency Checks
