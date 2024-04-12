@@ -3,15 +3,17 @@
             [clj-depend.analyzers.layer :as analyzers.layer]
             [clj-depend.analyzers.rule :as analyzers.rule]))
 
-(defn- violations
+(defn ^:private violations
   [config dependencies-by-namespace namespace]
-  (let [dependencies (get dependencies-by-namespace namespace)
-        circular-dependency-violations (analyzers.circular-dependency/analyze namespace dependencies dependencies-by-namespace)
-        layer-violations (analyzers.layer/analyze config namespace dependencies)
-        rule-violations (analyzers.rule/analyze config namespace dependencies)]
+  (let [circular-dependency-violations (analyzers.circular-dependency/analyze namespace dependencies-by-namespace)
+        layer-violations (analyzers.layer/analyze config namespace dependencies-by-namespace)
+        rule-violations (analyzers.rule/analyze config namespace dependencies-by-namespace)]
     (not-empty (concat circular-dependency-violations layer-violations rule-violations))))
 
 (defn analyze
   "Analyze namespaces dependencies."
-  [{:keys [config dependencies-by-namespace]}]
-  (flatten (keep #(violations config dependencies-by-namespace %) (keys dependencies-by-namespace))))
+  [{:keys [config namespaces-to-be-analyzed namespaces-and-dependencies]}]
+  (let [dependencies-by-namespace (reduce-kv (fn [m k v] (assoc m k (:dependencies (first v))))
+                                             {}
+                                             (group-by :namespace namespaces-and-dependencies))]
+    (flatten (keep #(violations config dependencies-by-namespace %) namespaces-to-be-analyzed))))

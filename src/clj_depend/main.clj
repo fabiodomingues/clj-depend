@@ -24,7 +24,7 @@
     :id :snapshot?
     :default false]])
 
-(defn- exit!
+(defn ^:private exit!
   [exit-code message]
   (when message (println message))
   (System/exit (or exit-code 2)))

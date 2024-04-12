@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## Unreleased
+* [#56](https://github.com/fabiodomingues/clj-depend/issues/56): Added the `:only-ns-in-source-paths` attribute for when it is necessary to consider only namespaces in source paths as part of a layer.
 
 ## 0.10.0 (2024-04-08)
 * [#51](https://github.com/fabiodomingues/clj-depend/issues/51): Namespace rule analyzer.

@@ -15,7 +15,7 @@
                                     :message              "\"foo.a.bar\" should not depend on \"foo.b.baz\""}])
                   (analyzers.rule/analyze config
                                           'foo.a.bar
-                                          #{'foo.b.bar 'foo.c.bar 'foo.b.baz})))
+                                          {'foo.a.bar #{'foo.b.bar 'foo.c.bar 'foo.b.baz}})))
 
       {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\..*"}}]}
       {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{'foo.b.bar 'foo.b.baz}}]}
@@ -31,15 +31,15 @@
              :message              "Prefer using foo.x.bar instead of foo.b.bar"}]
            (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.b\\..*"} :message "Prefer using foo.x.bar instead of foo.b.bar"}]}
                                    'foo.a.bar
-                                   #{'foo.b.bar}))))
+                                   {'foo.a.bar #{'foo.b.bar}}))))
 
   (testing "should not return violations when there is a rule for the namespace but the constraints are not satisfied"
     (is (empty? (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.d\\..*"}}]}
                                         'foo.a.bar
-                                        #{'foo.b.bar 'foo.c.bar 'foo.b.baz}))))
+                                        {'foo.a.bar #{'foo.b.bar 'foo.c.bar 'foo.b.baz}}))))
 
   (testing "should not return violations when there is no rule for the namespaces"
     (is (empty? (analyzers.rule/analyze {:rules [{:defined-by ".*\\.a\\..*" :should-not-depend-on #{".*\\.d\\..*"}}]}
                                         'foo.a.bar
-                                        #{'foo.b.bar 'foo.c.bar 'foo.b.baz}))))
+                                        {'foo.a.bar #{'foo.b.bar 'foo.c.bar 'foo.b.baz}}))))
   )

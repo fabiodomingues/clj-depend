@@ -3,12 +3,12 @@
   (:require [clj-depend.main :as clj-depend.main]
             [leiningen.core.main :as leiningen.core]))
 
-(defn- project->args
+(defn ^:private project->args
   [{:keys [root]} args]
   (concat (or args [])
           ["--project-root" root]))
 
-(defn- run!
+(defn ^:private run!
   [project args]
   (let [result (apply clj-depend.main/run! (project->args project args))]
     (when-let [message (:message result)]

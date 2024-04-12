@@ -42,7 +42,8 @@
 (defn analyze
   [{:keys [rules]}
    namespace
-   dependencies]
-  (->> (filter #(rule-applies-to-namespace? % namespace) rules)
-       (keep #(violations-by-rule % namespace dependencies))
-       flatten))
+   dependencies-by-namespace]
+  (let [current-namespace-dependencies (get dependencies-by-namespace namespace)]
+    (->> (filter #(rule-applies-to-namespace? % namespace) rules)
+         (keep #(violations-by-rule % namespace current-namespace-dependencies))
+         flatten)))
