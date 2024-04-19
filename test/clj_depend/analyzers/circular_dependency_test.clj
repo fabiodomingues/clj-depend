@@ -8,12 +8,10 @@
              :dependency-namespace 'foo.b
              :message              "Circular dependency between \"foo.a\" and \"foo.b\""}]
            (analyzers.circular-dependency/analyze 'foo.a
-                                                  #{'foo.b}
                                                   {'foo.a #{'foo.b}
                                                    'foo.b #{'foo.a}}))))
 
   (testing "should not return violations when there is no circular dependency"
     (is (empty? (analyzers.circular-dependency/analyze 'foo.a
-                                                       #{'foo.b}
                                                        {'foo.a #{'foo.b}
                                                         'foo.b #{}})))))

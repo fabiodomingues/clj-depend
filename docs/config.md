@@ -37,6 +37,7 @@ Default: `{}`.
 A map where each key is a layer and the value is a map, where:
 - The layer is defined by a regex using the `:defined-by` key or a set of namespaces using the `:namespaces` key.
 - The accesses allowed by it declared using the `:accesses-layers` key, or the accesses that are allowed to the layer using the `:accessed-by-layers` key. Since both keys accept a set of layers.
+- `:only-ns-in-source-paths` optional, only considers namespaces in source paths as part of a layer. Available values: `true`, `false` with default value of `false`.
 
 Config example:
 ```clojure
@@ -45,8 +46,9 @@ Config example:
                        :accesses-layers #{:logic :model}}
           :logic      {:defined-by      ".*\\.logic\\..*"
                        :accesses-layers #{:model}}
-          :model      {:defined-by      ".*\\.model\\..*"
-                       :accesses-layers #{}}}
+          :model      {:defined-by              ".*\\.model\\..*"
+                       :accesses-layers         #{}
+                       :only-ns-in-source-paths true}}
  ,,,}
 ```
 
