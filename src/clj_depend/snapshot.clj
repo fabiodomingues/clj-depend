@@ -2,6 +2,8 @@
   (:require [clojure.edn :as edn]
             [clojure.java.io :as io]))
 
+(set! *warn-on-reflection* true)
+
 (defn ^:private ->snapshot-violation
   [violation]
   (select-keys violation [:namespace :dependency-namespace :layer :dependency-layer]))

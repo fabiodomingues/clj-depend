@@ -3,6 +3,8 @@
             [clojure.java.io :as io])
   (:import (java.io PushbackReader)))
 
+(set! *warn-on-reflection* true)
+
 (def ^:private default-config
   {:source-paths #{"src"}
    :layers       {}

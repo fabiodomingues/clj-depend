@@ -1,6 +1,8 @@
 (ns clj-depend.analyzers.layer
   (:require [clojure.set :as set]))
 
+(set! *warn-on-reflection* true)
+
 (defn ^:private layer-cannot-access-dependency-layer?
   [config layer dependency-layer]
   (when-let [accesses-layers (get-in config [:layers layer :accesses-layers])]

@@ -3,6 +3,8 @@
             [clj-depend.analyzers.layer :as analyzers.layer]
             [clj-depend.analyzers.rule :as analyzers.rule]))
 
+(set! *warn-on-reflection* true)
+
 (defn ^:private violations
   [config dependencies-by-namespace namespace]
   (let [circular-dependency-violations (analyzers.circular-dependency/analyze namespace dependencies-by-namespace)
