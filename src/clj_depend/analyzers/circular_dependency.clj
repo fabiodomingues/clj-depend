@@ -1,5 +1,7 @@
 (ns clj-depend.analyzers.circular-dependency)
 
+(set! *warn-on-reflection* true)
+
 (defn analyze
   [namespace dependencies-by-namespace]
   (let [current-namespace-dependencies (get dependencies-by-namespace namespace)]

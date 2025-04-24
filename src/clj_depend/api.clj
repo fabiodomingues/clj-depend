@@ -2,6 +2,8 @@
   (:require [clj-depend.internal-api :as internal-api])
   (:import [java.io File]))
 
+(set! *warn-on-reflection* true)
+
 (defn configured?
   "Given the project root directory, check if it has the configuration file (`.clj-depend/config.edn`).
 

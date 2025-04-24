@@ -1,5 +1,7 @@
 (ns clj-depend.analyzers.rule)
 
+(set! *warn-on-reflection* true)
+
 (defn ^:private violation
   [namespace
    dependency

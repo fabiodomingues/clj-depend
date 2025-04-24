@@ -8,6 +8,8 @@
             [clojure.tools.namespace.find :as namespace.find]
             [clojure.tools.namespace.parse :as namespace.parse]))
 
+(set! *warn-on-reflection* true)
+
 (defn ^:private ->project-root
   [{:keys [project-root]} context]
   (assoc context :project-root project-root))
@@ -23,18 +25,30 @@
     (map #(io/file project-root %) source-paths)
     #{project-root}))
 
+(defn ^:private file-path-starts-with? [^java.io.File file ^java.io.File start-file]
+  (let [^java.nio.file.Path file-path (.toPath file)
+        ^java.nio.file.Path start-path (.toPath start-file)]
+    (.startsWith file-path start-path)))
+
+(defn ^:private in-files-to-be-analyzed? [file files-to-be-analyzed]
+  (some #(file-path-starts-with? file %) files-to-be-analyzed))
+
+(defn ^:private in-namespaces-to-be-analyzed? [namespace namespaces-to-be-analyzed]
+  (contains? namespaces-to-be-analyzed namespace))
+
 (defn ^:private analyze?
   [{:keys [file namespace]} files-to-be-analyzed namespaces-to-be-analyzed]
   (boolean (cond
-             (and (not-empty files-to-be-analyzed) (not-empty namespaces-to-be-analyzed))
-             (and (some #(.startsWith (.toPath file) (.toPath %)) files-to-be-analyzed)
-                  (contains? namespaces-to-be-analyzed namespace))
+             (and (not-empty files-to-be-analyzed)
+                  (not-empty namespaces-to-be-analyzed))
+             (and (in-files-to-be-analyzed? file files-to-be-analyzed)
+                  (in-namespaces-to-be-analyzed? namespace namespaces-to-be-analyzed))
 
              (not-empty files-to-be-analyzed)
-             (some #(.startsWith (.toPath file) (.toPath %)) files-to-be-analyzed)
+             (in-files-to-be-analyzed? file files-to-be-analyzed)
 
              (not-empty namespaces-to-be-analyzed)
-             (contains? namespaces-to-be-analyzed namespace)
+             (in-namespaces-to-be-analyzed? namespace namespaces-to-be-analyzed)
 
              :else
              true)))

@@ -5,6 +5,8 @@
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
+(set! *warn-on-reflection* true)
+
 (def cli-options
   [["-p" "--project-root PATH" "Specify the path to the project root to clj-depend consider during analysis."
     :id :project-root
