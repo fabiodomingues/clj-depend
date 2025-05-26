@@ -16,7 +16,7 @@ Add clj-depend as a dependency, preferably under an alias in `deps.edn`.
 
 ```clojure
 {:deps { ,,, }
- :aliases {:clj-depend {:extra-deps {com.fabiodomingues/clj-depend {:mvn/version "0.11.0"}}
+ :aliases {:clj-depend {:extra-deps {com.fabiodomingues/clj-depend {:mvn/version "0.11.1"}}
                         :main-opts ["-m" "clj-depend.main"]}}}
 ```
 

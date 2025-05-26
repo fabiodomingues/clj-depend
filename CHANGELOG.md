@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## Unreleased
+
+## 0.11.1 (2025-05-26)
 * [#61](https://github.com/fabiodomingues/clj-depend/issues/61): Fix reflection warnings. 
 
 ## 0.11.0 (2024-04-19)
