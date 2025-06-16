@@ -1,9 +1,10 @@
 # CHANGELOG
 
 ## Unreleased
+* [#22](https://github.com/fabiodomingues/clj-depend/issues/22): Restrict namespaces to access others namespaces on the same layer
 
 ## 0.11.1 (2025-05-26)
-* [#61](https://github.com/fabiodomingues/clj-depend/issues/61): Fix reflection warnings. 
+* [#61](https://github.com/fabiodomingues/clj-depend/issues/61): Fix reflection warnings.
 
 ## 0.11.0 (2024-04-19)
 * [#56](https://github.com/fabiodomingues/clj-depend/issues/56): Added the `:only-ns-in-source-paths` attribute for when it is necessary to consider only namespaces in source paths as part of a layer.

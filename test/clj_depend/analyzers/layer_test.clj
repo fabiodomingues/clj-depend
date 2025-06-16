@@ -91,4 +91,67 @@
       (testing "when a namespace that is not in the source-paths and that matches the defined-by regular expression of a layer that is not allowed to be accessed"
         (let [violations (analyzers.layer/analyze config 'foo.b.bar {'foo.b.bar #{'foo.a.bar}})]
           (testing "then no violations should have been returned"
-            (is (empty? violations))))))))
+            (is (empty? violations)))))))
+
+  (testing "Given a configuration with access-peer-ns? enabled (default behavior)"
+    (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"}}}]
+
+      (testing "when a namespace in the same layer depends on another namespace in the same layer"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.bar}})]
+          (testing "then no violations should be returned"
+            (is (= []
+                   violations)))))
+
+      (testing "when a namespace depends on itself"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.foo}})]
+          (testing "then no violations should be returned"
+            (is (= []
+                   violations)))))))
+
+  (testing "Given a configuration with access-peer-ns? disabled"
+    (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
+                                        :access-peer-ns false}}}]
+
+      (testing "when a namespace in the same layer depends on another namespace in the same layer"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.bar}})]
+          (testing "then a violation should be returned"
+            (is (= [{:namespace            'my-app.controller.foo
+                     :dependency-namespace 'my-app.controller.bar
+                     :layer                :controller
+                     :dependency-layer     :controller
+                     :message              "\"my-app.controller.foo\" should not depend on \"my-app.controller.bar\" (layer \":controller\" on \":controller\")"}]
+                   violations)))))
+
+      (testing "when a namespace depends on itself"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.foo}})]
+          (testing "then no violations should be returned"
+            (is (= []
+                   violations)))))))
+
+  (testing "Given a configuration with access-peer-ns? explicitly enabled"
+    (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
+                                        :access-peer-ns true}}}]
+
+      (testing "when a namespace in the same layer depends on another namespace in the same layer"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.bar}})]
+          (testing "then no violations should be returned"
+            (is (= []
+                   violations)))))
+
+      (testing "when a namespace depends on itself"
+        (let [violations (analyzers.layer/analyze config
+                                                  'my-app.controller.foo
+                                                  {'my-app.controller.foo #{'my-app.controller.foo}})]
+          (testing "then no violations should be returned"
+            (is (= []
+                   violations))))))))

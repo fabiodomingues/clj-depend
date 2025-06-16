@@ -15,12 +15,18 @@
 
 (defn ^:private violate?
   [config
-   {:keys [layer dependency-layer]}]
-  (and (not= layer dependency-layer)
-       (and (not (nil? layer))
-            (not (nil? dependency-layer)))
-       (or (dependency-layer-cannot-be-accessed-by-layer? config dependency-layer layer)
-           (layer-cannot-access-dependency-layer? config layer dependency-layer))))
+   {:keys [namespace dependency-namespace layer dependency-layer]}]
+  (let [same-namespace? (= namespace dependency-namespace)
+        same-layer? (= layer dependency-layer)
+        access-peer-ns? (get-in config [:layers layer :access-peer-ns] true)]
+    (cond
+      same-namespace? false
+      (and same-layer? (not access-peer-ns?)) true
+      (and (not= layer dependency-layer)
+           (some? layer)
+           (some? dependency-layer))
+      (or (dependency-layer-cannot-be-accessed-by-layer? config dependency-layer layer)
+          (layer-cannot-access-dependency-layer? config layer dependency-layer)))))
 
 (defn ^:private namespace-in-source-paths?
   [namespace dependencies-by-namespace]
