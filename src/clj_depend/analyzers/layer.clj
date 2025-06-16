@@ -18,10 +18,10 @@
    {:keys [namespace dependency-namespace layer dependency-layer]}]
   (let [same-namespace? (= namespace dependency-namespace)
         same-layer? (= layer dependency-layer)
-        allow-same-layer-access-between-different-namespaces? (get-in config [:layers layer :allow-same-layer-access-between-different-namespaces?] true)]
+        access-peer-ns? (get-in config [:layers layer :access-peer-ns?] true)]
     (cond
       same-namespace? false
-      (and same-layer? (not allow-same-layer-access-between-different-namespaces?)) true
+      (and same-layer? (not access-peer-ns?)) true
       (and (not= layer dependency-layer)
            (some? layer)
            (some? dependency-layer))

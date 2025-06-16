@@ -93,7 +93,7 @@
           (testing "then no violations should have been returned"
             (is (empty? violations)))))))
 
-  (testing "Given a configuration with allow-same-layer-access-between-different-namespaces? enabled (default behavior)"
+  (testing "Given a configuration with access-peer-ns? enabled (default behavior)"
     (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"}}}]
 
       (testing "when a namespace in the same layer depends on another namespace in the same layer"
@@ -112,9 +112,9 @@
             (is (= []
                    violations)))))))
 
-  (testing "Given a configuration with allow-same-layer-access-between-different-namespaces? disabled"
+  (testing "Given a configuration with access-peer-ns? disabled"
     (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
-                                        :allow-same-layer-access-between-different-namespaces? false}}}]
+                                        :access-peer-ns? false}}}]
 
       (testing "when a namespace in the same layer depends on another namespace in the same layer"
         (let [violations (analyzers.layer/analyze config
@@ -136,9 +136,9 @@
             (is (= []
                    violations)))))))
 
-  (testing "Given a configuration with allow-same-layer-access-between-different-namespaces? explicitly enabled"
+  (testing "Given a configuration with access-peer-ns? explicitly enabled"
     (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
-                                        :allow-same-layer-access-between-different-namespaces? true}}}]
+                                        :access-peer-ns? true}}}]
 
       (testing "when a namespace in the same layer depends on another namespace in the same layer"
         (let [violations (analyzers.layer/analyze config
