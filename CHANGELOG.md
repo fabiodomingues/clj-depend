@@ -1,7 +1,7 @@
 # CHANGELOG
 
 ## Unreleased
-* [#21](https://github.com/fabiodomingues/clj-depend/issues/22): Restrict namespaces to access others namespaces on the same layer
+* [#22](https://github.com/fabiodomingues/clj-depend/issues/22): Restrict namespaces to access others namespaces on the same layer
 
 ## 0.11.1 (2025-05-26)
 * [#61](https://github.com/fabiodomingues/clj-depend/issues/61): Fix reflection warnings.
