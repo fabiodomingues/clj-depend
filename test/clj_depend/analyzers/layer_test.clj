@@ -114,7 +114,7 @@
 
   (testing "Given a configuration with access-peer-ns? disabled"
     (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
-                                        :access-peer-ns? false}}}]
+                                        :access-peer-ns false}}}]
 
       (testing "when a namespace in the same layer depends on another namespace in the same layer"
         (let [violations (analyzers.layer/analyze config
@@ -138,7 +138,7 @@
 
   (testing "Given a configuration with access-peer-ns? explicitly enabled"
     (let [config {:layers {:controller {:defined-by ".*\\.controller\\..*"
-                                        :access-peer-ns? true}}}]
+                                        :access-peer-ns true}}}]
 
       (testing "when a namespace in the same layer depends on another namespace in the same layer"
         (let [violations (analyzers.layer/analyze config
