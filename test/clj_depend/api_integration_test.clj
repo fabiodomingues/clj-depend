@@ -20,15 +20,18 @@
             :message     "Circular dependency between \"sample.controller.foo\" and \"sample.logic.foo\"\nCircular dependency between \"sample.logic.foo\" and \"sample.controller.foo\"\n\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
             :violations  [{:namespace 'sample.controller.foo
                            :dependency-namespace 'sample.logic.foo
-                           :message   "Circular dependency between \"sample.controller.foo\" and \"sample.logic.foo\""}
+                           :message   "Circular dependency between \"sample.controller.foo\" and \"sample.logic.foo\""
+                           :level     :error}
                           {:namespace 'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
-                           :message   "Circular dependency between \"sample.logic.foo\" and \"sample.controller.foo\""}
+                           :message   "Circular dependency between \"sample.logic.foo\" and \"sample.controller.foo\""
+                           :level     :error}
                           {:namespace            'sample.logic.foo
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-cyclic-dependency"))})))))
 
 (deftest analyze-project-without-violations
@@ -45,8 +48,57 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))})))))
+
+(deftest analyze-project-with-violation-with-different-levels
+  (testing "should return result code 1 when there is at least one violation with level equal to :error and there is no level in the config"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations"))}))))
+
+  (testing "should return result code 1 when there is at least one violation with level equal to :error and there the level in the config is :error"
+    (is (= {:result-code 1
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations"))
+                         :config {:level :error}}))))
+
+  (testing "should return result code 0 when there is no violation with level equal to :error and the level in the config is :warning"
+    (is (= {:result-code 0
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :warning}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations"))
+                         :config {:level :warning}}))))
+
+  (testing "should return result code 0 when there is no violation with level equal to :error and the level in the config is :info"
+    (is (= {:result-code 0
+            :message     "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+            :violations  [{:namespace            'sample.logic.foo
+                           :dependency-namespace 'sample.controller.foo
+                           :layer                :logic
+                           :dependency-layer     :controller
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :info}]}
+           (api/analyze {:project-root (io/file (io/resource "with-violations"))
+                         :config {:level :info}})))))
 
 (deftest analyze-project-with-custom-config
   (testing "should fail when given a different configuration as a parameter"
@@ -56,7 +108,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :server
                            :dependency-layer     :controller
-                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"}]}
+                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
                          :config       {:layers {:server     {:namespaces         #{'sample.server}
                                                               :accessed-by-layers #{}}
@@ -83,7 +136,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :server
                            :dependency-layer     :controller
-                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"}]}
+                           :message              "\"sample.server\" should not depend on \"sample.controller.foo\" (layer \":server\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "without-violations"))
                          :config       {:source-paths #{}
                                         :layers       {:server     {:namespaces         #{'sample.server}
@@ -107,7 +161,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :namespaces   #{'sample.logic.foo}})))))
 
@@ -125,7 +180,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations"))
                          :files        #{(io/file (io/resource "with-violations/src/sample/logic/foo.clj"))}})))))
 
@@ -150,7 +206,8 @@
                            :dependency-namespace 'module2.logic.foo
                            :layer                :module1-controller
                            :dependency-layer     :module2-logic
-                           :message              "\"module1.controller.foo\" should not depend on \"module2.logic.foo\" (layer \":module1-controller\" on \":module2-logic\")"}]}
+                           :message              "\"module1.controller.foo\" should not depend on \"module2.logic.foo\" (layer \":module1-controller\" on \":module2-logic\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-for-modular-structure"))})))))
 
 (deftest analyze-project-with-violation-between-different-source-paths
@@ -167,7 +224,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
                          :config       {:source-paths #{"src" "test"}}}))))
 
@@ -178,7 +236,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo-test\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-between-different-source-paths"))
                          :config       {:source-paths #{}}}))))
 
@@ -221,7 +280,8 @@
                            :dependency-namespace 'sample.controller.foo
                            :layer                :logic
                            :dependency-layer     :controller
-                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"}]}
+                           :message              "\"sample.logic.foo\" should not depend on \"sample.controller.foo\" (layer \":logic\" on \":controller\")"
+                           :level                :error}]}
            (api/analyze {:project-root (io/file (io/resource "with-violations-without-config"))
                          :config       {:source-paths #{"src"}
                                         :layers       {:server     {:namespaces         #{'sample.server}

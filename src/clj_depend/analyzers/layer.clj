@@ -1,5 +1,4 @@
-(ns clj-depend.analyzers.layer
-  (:require [clojure.set :as set]))
+(ns clj-depend.analyzers.layer)
 
 (set! *warn-on-reflection* true)
 
@@ -52,13 +51,6 @@
      :layer                layer
      :dependency-namespace dependency-namespace
      :dependency-layer     (layer-by-namespace config dependency-namespace dependencies-by-namespace)}))
-
-(defn ^:private namespace-dependencies
-  [{:keys [only-ns-in-source-paths]} namespace dependencies-by-namespace]
-  (let [namespace-dependencies (get dependencies-by-namespace namespace)]
-    (if only-ns-in-source-paths
-      (set/intersection (set namespace-dependencies) (set (keys dependencies-by-namespace)))
-      namespace-dependencies)))
 
 (defn analyze
   [config namespace dependencies-by-namespace]

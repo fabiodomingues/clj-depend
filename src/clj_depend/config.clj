@@ -7,6 +7,7 @@
 
 (def ^:private default-config
   {:source-paths #{"src"}
+   :level        :error
    :layers       {}
    :rules        []})
 

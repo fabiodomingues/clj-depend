@@ -1,12 +1,13 @@
 (ns clj-depend.internal-api
-  (:require [clj-depend.analyzer :as analyzer]
-            [clj-depend.config :as config]
-            [clj-depend.snapshot :as snapshot]
-            [clojure.java.io :as io]
-            [clojure.string :as string]
-            [clojure.tools.namespace.file :as file]
-            [clojure.tools.namespace.find :as namespace.find]
-            [clojure.tools.namespace.parse :as namespace.parse]))
+  (:require
+   [clj-depend.analyzer :as analyzer]
+   [clj-depend.config :as config]
+   [clj-depend.snapshot :as snapshot]
+   [clojure.java.io :as io]
+   [clojure.string :as string]
+   [clojure.tools.namespace.file :as file]
+   [clojure.tools.namespace.find :as namespace.find]
+   [clojure.tools.namespace.parse :as namespace.parse]))
 
 (set! *warn-on-reflection* true)
 
@@ -90,13 +91,14 @@
     (let [context (build-context options)
           violations (analyzer/analyze context)
           _ (snapshot/dump-when-enabled! violations options)
-          violations (snapshot/without-violations-present-in-snapshot-file! violations options)]
-      (if (seq violations)
-        {:result-code 1
-         :message     (string/join "\n" (map :message violations))
-         :violations  violations}
-        {:result-code 0
-         :message     "No violations found!"}))
+          violations (->> (snapshot/without-violations-present-in-snapshot-file! violations options)
+                          (map #(assoc % :level (-> context :config :level))))
+          errors? (some (comp #(= :error %) :level) violations)]
+      (cond-> {:result-code (if errors? 1 0)
+               :message     (if (empty? violations)
+                              "No violations found!"
+                              (string/join "\n" (map :message violations)))}
+        (not-empty violations) (assoc :violations  violations)))
     (catch Exception e
       {:result-code 2
        :message     (ex-message e)})))
