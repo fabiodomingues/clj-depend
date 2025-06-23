@@ -15,6 +15,19 @@ The configurations are merged in the following order, where a later config overr
 
 You can find all settings and its default values [here](../src/clj_depend/config.clj) and below the docs for each one:
 
+### :level
+
+Severity level of violations, if any.
+
+Default: `:error`.
+
+Config example:
+```clojure
+{,,,
+ :level :error
+ ,,,}
+```
+
 ### :source-paths
 
 Directories within the project to look for clj files. Files outside the source-paths will be ignored.
@@ -61,6 +74,7 @@ Defining the rules for namespaces.
 Default: `[]`.
 
 A vector of rules whose each rule is a map composed of the following fields:
+
 - `:defined-by` optional, a regular expression (regex) that serves as a predicate to identify whether the rule should be evaluated.
 - `:namespaces` optional, a set of namespaces that serves as a predicate to identify whether the rule should be evaluated.
 - `:should-not-depend-on` required, a set of namespaces or regular expressions (regex).
